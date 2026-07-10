@@ -1,0 +1,178 @@
+.filter-sidebar {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.filter-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.clear-filters-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+
+.clear-filters-btn:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-group h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar for checklist menus */
+.filter-options::-webkit-scrollbar {
+  width: 4px;
+}
+
+.filter-options::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+}
+
+.filter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+/* Price range slider styles */
+.price-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-slider {
+  width: 100%;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  height: 6px;
+  background-color: var(--border-color);
+  border-radius: 3px;
+  outline: none;
+}
+
+.price-values {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+
+.current-price-val {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 0.8rem;
+}
+
+/* Rating filter button rows */
+.rating-filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-filter-btn {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  justify-content: space-between;
+}
+
+.rating-filter-btn:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-color);
+}
+
+.rating-filter-btn.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.rating-filter-btn.active .stars-row {
+  color: #ffffff;
+}
+
+.stars-row {
+  display: flex;
+  align-items: center;
+  color: var(--rating-color);
+}
+
+.stars-row .star {
+  margin-right: 2px;
+}
+
+.stars-row .empty-star {
+  color: var(--border-color);
+  margin-right: 2px;
+}
+
+.rating-filter-btn.active .stars-row .empty-star {
+  color: rgba(255, 255, 255, 0.4);
+}
