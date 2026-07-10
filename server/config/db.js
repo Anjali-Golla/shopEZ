@@ -111,13 +111,17 @@ const seedDefaultCategories = async () => {
 
 const connectDB = async () => {
   try {
+    if (!process.env.MONGO_URI) {
+      console.warn('MONGO_URI is not set in environment variables');
+      return;
+    }
     const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log('MongoDB Connected');
     await seedAdminUser();
     await seedDefaultCategories();
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    // Do not crash process.exit(1) so server container stays healthy on cloud platforms
   }
 };
 
