@@ -72,8 +72,7 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Left: Brand Logo */}
         <Link to="/" className="navbar-logo" onClick={() => setIsOpen(false)}>
-          <FaShoppingBag className="logo-icon" />
-          <span>ShopEZ</span>
+          <img src="/logo.jpg" alt="SHOPEZ Logo" className="navbar-logo-img" />
         </Link>
 
         {/* Center: Search Bar */}

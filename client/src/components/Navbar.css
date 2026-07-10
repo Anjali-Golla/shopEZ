@@ -39,6 +39,18 @@
   color: var(--primary-dark);
 }
 
+.navbar-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.navbar-logo:hover .navbar-logo-img {
+  transform: scale(1.03);
+}
+
 /* Search Bar styling */
 .navbar-search {
   display: flex;

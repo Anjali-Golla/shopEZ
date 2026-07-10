@@ -19,7 +19,7 @@ const Footer = () => {
           <div className="footer-grid">
             {/* Column 1: About Brand */}
             <div className="footer-col about-col">
-              <h3>ShopEZ</h3>
+              <img src="/logo.jpg" alt="SHOPEZ Logo" style={{ height: '44px', marginBottom: '12px', borderRadius: '4px' }} />
               <p>
                 Your ultimate destination for modern, premium shopping. Experience high quality electronics, fashion, and lifestyle accessories delivered directly to your doorstep.
               </p>

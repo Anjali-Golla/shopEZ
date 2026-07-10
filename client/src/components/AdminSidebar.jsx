@@ -43,7 +43,7 @@ const AdminSidebar = ({ collapsed, toggleSidebar }) => {
       <div className="sidebar-brand-wrapper">
         {!collapsed && (
           <div className="brand-logo-flex">
-            <h2>ShopEZ</h2>
+            <img src="/logo.jpg" alt="SHOPEZ Logo" style={{ height: '38px', borderRadius: '4px' }} />
           </div>
         )}
         <button className="sidebar-toggle" onClick={toggleSidebar} aria-label="Toggle Sidebar">
