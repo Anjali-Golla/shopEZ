@@ -180,14 +180,19 @@
 
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  gap: 20px;
+}
+
+#categories-section {
+  gap: 16px; /* Tighten gap between header and grid */
 }
 
 .products-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
+  grid-auto-rows: 1fr;
 }
 
 /* 4. Offer Banner Section */

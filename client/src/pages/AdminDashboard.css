@@ -1007,3 +1007,560 @@
     flex-wrap: wrap;
   }
 }
+
+/* ==========================================================================
+   INVENTORY & PROFILE TAB CUSTOM ENHANCEMENTS
+   ========================================================================== */
+
+/* Equal grid distribution for 3 stats cards */
+.tab-view-wrap .stats-cards-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px;
+}
+
+.tab-view-wrap .stat-card {
+  min-height: 110px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  align-items: center;
+}
+
+.tab-view-wrap .stat-card h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+/* Professional Table styling for inventory */
+.tab-view-wrap .table-card {
+  overflow-x: auto;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+}
+
+.tab-view-wrap .admin-table th,
+.tab-view-wrap .admin-table td {
+  padding: 16px 20px;
+  vertical-align: middle;
+}
+
+/* Truncate long product names with ellipsis to keep columns aligned */
+.tab-view-wrap .product-table-cell strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.tab-view-wrap .admin-table td .btn {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  padding: 8px 14px;
+}
+
+/* Dark mode compatibility fixes */
+body.dark-theme .tab-view-wrap .stat-card {
+  background-color: var(--card-bg);
+}
+
+/* Responsive constraints for inventory stats */
+@media (max-width: 992px) {
+  .tab-view-wrap .stats-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-view-wrap .stats-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .tab-view-wrap .product-table-cell strong {
+    max-width: 200px;
+  }
+}
+
+/* ==========================================================================
+   MODAL & QUICK ACTIONS FORM REDESIGN STYLES
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.65); /* Translucent overlay */
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 24px;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+.modal-content-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 680px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  animation: modalSlideUp 0.25s ease-out;
+  overflow: hidden;
+}
+
+.modal-content-card.small {
+  max-width: 480px;
+}
+
+.modal-header-row {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-color);
+}
+
+.modal-header-row h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.close-modal-trigger {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.close-modal-trigger:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+/* Modal Form Layout & Sections */
+.modal-form-grid {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.form-section {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section-title {
+  font-size: 0.95rem;
+  font-weight: 750;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  height: 42px; /* Increased height */
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.form-group textarea {
+  height: auto;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.disabled-input {
+  background-color: var(--border-color) !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Input Rows */
+.form-row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-row-three {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* Checkboxes grid style */
+.tags-checkboxes-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  background-color: var(--bg-color);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.checkbox-flex-lbl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.checkbox-flex-lbl input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+/* Actions footer */
+.modal-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  border-top: 1px solid var(--border-color);
+  padding: 20px 24px;
+  background-color: var(--bg-color);
+}
+
+.modal-actions-row .btn {
+  min-width: 140px;
+  height: 42px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive adjustment for forms */
+@media (max-width: 768px) {
+  .form-row-two, .form-row-three {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+  .tags-checkboxes-row {
+    grid-template-columns: 1fr !important;
+  }
+  .modal-actions-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-actions-row .btn {
+    width: 100%;
+  }
+  .modal-backdrop {
+    padding: 12px;
+  }
+}
+
+/* ==========================================================================
+   PRODUCTS MANAGEMENT TABLE REDESIGN STYLES
+   ========================================================================== */
+
+/* Premium Badge styling */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.admin-badge.featured {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+.admin-badge.trending {
+  background-color: rgba(230, 126, 34, 0.15);
+  color: #e67e22;
+}
+.admin-badge.bestseller {
+  background-color: rgba(155, 89, 182, 0.15);
+  color: #9b59b6;
+}
+.admin-badge.newarrival {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+.admin-badge.promo-tag {
+  background-color: rgba(100, 116, 139, 0.15);
+  color: #64748b;
+}
+
+/* Stock Indicator pill */
+.stock-indicator-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.stock-indicator-pill.good {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+.stock-indicator-pill.low {
+  background-color: rgba(241, 196, 15, 0.15);
+  color: #f1c40f;
+}
+.stock-indicator-pill.out {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+}
+
+/* Image Thumbnail */
+.table-thumb-premium {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.table-thumb-premium:hover {
+  transform: scale(1.06);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Rounded Circle Action buttons */
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn-action {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+.icon-btn-action.view:hover { background-color: rgba(52, 152, 219, 0.15); color: #3498db; border-color: #3498db; }
+.icon-btn-action.copy:hover { background-color: rgba(46, 204, 113, 0.15); color: #2ecc71; border-color: #2ecc71; }
+.icon-btn-action.edit:hover { background-color: rgba(241, 196, 15, 0.15); color: #f1c40f; border-color: #f1c40f; }
+.icon-btn-action.delete:hover { background-color: rgba(231, 76, 60, 0.15); color: #e74c3c; border-color: #e74c3c; }
+
+/* Filter & Search Bar Size Adjustments */
+.tab-filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.search-box-wrapper {
+  flex: 1;
+  min-width: 340px; /* Wider search bar */
+  max-width: 500px;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-controls select {
+  min-width: 170px; /* Wider filters */
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  outline: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: border-color var(--transition-fast);
+}
+.filter-controls select:focus {
+  border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   INVENTORY TABLE & KPI CARDS UI REFINEMENTS
+   ========================================================================== */
+
+/* KPI Cards Layout & Hierarchy scaling */
+.stats-cards-grid .stat-card {
+  padding: 24px;
+  min-height: 120px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.stats-cards-grid .stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stats-cards-grid .card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.stats-cards-grid .card-info span {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-cards-grid .card-info h3 {
+  font-size: 2.1rem !important;
+  font-weight: 850 !important;
+  color: var(--text-color) !important;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+/* Total Revenue Card Price style adjustment */
+.stats-cards-grid .card-info .price-container,
+.stats-cards-grid .card-info .price-size-lg,
+.stats-cards-grid .card-info .price-current {
+  font-size: 2.1rem !important;
+  font-weight: 850 !important;
+  color: var(--text-color) !important;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  gap: 4px;
+}
+
+/* Icon alignments */
+.stats-cards-grid .stat-card .icon-wrapper {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+/* Inventory Table sizing definitions */
+.inventory-table tr {
+  height: 80px; /* Forced heights */
+}
+
+.inventory-table td {
+  vertical-align: middle !important;
+  padding: 12px 18px !important;
+}
+
+.inventory-product-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Max 2 lines clamp */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
+  font-size: 0.94rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--text-color);
+  word-break: break-word;
+  white-space: normal;
+}
+
+
+
+

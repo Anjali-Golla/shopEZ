@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 32px;
   padding: 16px 0;
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Horizontal Step Indicator Bar */

@@ -3,11 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FaChartLine,
   FaUsers,
+  FaUser,
   FaBoxOpen,
   FaShoppingBag,
   FaTags,
-  FaRegFileAlt,
-  FaPercent,
   FaCog,
   FaSignOutAlt,
   FaBars
@@ -26,10 +25,8 @@ const AdminSidebar = ({ collapsed, toggleSidebar }) => {
     { id: 'categories', label: 'Categories', path: '/admin/categories', icon: FaTags },
     { id: 'orders', label: 'Orders', path: '/admin/orders', icon: FaShoppingBag },
     { id: 'users', label: 'Users', path: '/admin/users', icon: FaUsers },
-    { id: 'reviews', label: 'Reviews', path: '/admin/reviews', icon: FaRegFileAlt },
-    { id: 'coupons', label: 'Coupons', path: '/admin/coupons', icon: FaPercent },
-    { id: 'analytics', label: 'Analytics', path: '/admin/analytics', icon: FaChartLine },
-    { id: 'settings', label: 'Settings', path: '/admin/settings', icon: FaCog }
+    { id: 'inventory', label: 'Inventory', path: '/admin/inventory', icon: FaBoxOpen },
+    { id: 'profile', label: 'Profile', path: '/admin/profile', icon: FaUser }
   ];
 
   const handleNavClick = (path) => {

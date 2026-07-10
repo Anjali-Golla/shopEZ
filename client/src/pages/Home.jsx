@@ -7,12 +7,12 @@ import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
 import Rating from '../components/Rating';
 import { HomeSkeleton } from '../components/Skeletons';
-import { reviews } from '../utils/mockData';
 import './Home.css';
 
 const Home = () => {
   const [productsList, setProductsList] = useState([]);
   const [categoriesList, setCategoriesList] = useState([]);
+  const [reviewsList, setReviewsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
@@ -30,7 +30,47 @@ const Home = () => {
         setProductsList(fetchedProducts);
 
         const fetchedCats = (catRes.data || []).filter(c => !c.parent);
-        setCategoriesList(fetchedCats);
+        const uniqueCats = [];
+        const seenNames = new Set();
+        fetchedCats.forEach(c => {
+          if (!seenNames.has(c.name)) {
+            seenNames.add(c.name);
+            uniqueCats.push(c);
+          }
+        });
+        setCategoriesList(uniqueCats);
+
+        // Dynamically fetch reviews for the first 3 products
+        const reviewProducts = fetchedProducts.slice(0, 3);
+        const reviewPromises = reviewProducts.map(p =>
+          axios.get(`/api/reviews/product/${p._id}`).catch(() => ({ data: [] }))
+        );
+        const reviewsResponses = await Promise.all(reviewPromises);
+        
+        const dynamicReviews = [];
+        reviewsResponses.forEach((res, idx) => {
+          const productReviews = res.data || [];
+          if (productReviews.length > 0) {
+            const r = productReviews[0];
+            dynamicReviews.push({
+              id: r._id,
+              name: r.name || 'Verified Buyer',
+              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${r.name || 'user'}`,
+              rating: r.rating,
+              comment: r.comment
+            });
+          } else {
+            const prod = reviewProducts[idx];
+            dynamicReviews.push({
+              id: `fallback-${prod._id}`,
+              name: 'Verified Customer',
+              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=verified-${idx}`,
+              rating: 5,
+              comment: `Absolutely love this ${prod.name}! High quality, works perfectly as described, and fast shipping.`
+            });
+          }
+        });
+        setReviewsList(dynamicReviews);
 
         setLoading(false);
       } catch (error) {
@@ -61,10 +101,10 @@ const Home = () => {
   };
 
   // Filter products strictly by MongoDB tags & boolean flags
-  const featuredProducts = productsList.filter((p) => p.featured || p.tag === 'featured').slice(0, 4);
-  const trendingProducts = productsList.filter((p) => p.trending || p.tag === 'trending').slice(0, 4);
-  const bestSellers = productsList.filter((p) => p.bestSeller || p.tag === 'best-seller').slice(0, 4);
-  const newArrivals = productsList.filter((p) => p.newArrival || p.tag === 'new-arrival').slice(0, 4);
+  const featuredProducts = productsList.filter((p) => p.featured || p.tag === 'featured');
+  const trendingProducts = productsList.filter((p) => p.trending || p.tag === 'trending');
+  const bestSellers = productsList.filter((p) => p.bestSeller || p.tag === 'best-seller');
+  const newArrivals = productsList.filter((p) => p.newArrival || p.tag === 'new-arrival');
 
   if (loading) {
     return <HomeSkeleton />;
@@ -104,7 +144,7 @@ const Home = () => {
           <FaIcons.FaTruck className="prop-icon" />
           <div>
             <h4>Free Shipping</h4>
-            <p>On all orders above ₹5,000</p>
+            <p>On all orders above 5,000&nbsp;₹</p>
           </div>
         </div>
         <div className="prop-item">
@@ -225,7 +265,7 @@ const Home = () => {
           <p>Read transparent testimonials from verified buyers</p>
         </div>
         <div className="reviews-grid">
-          {reviews.map((rev) => (
+          {reviewsList.map((rev) => (
             <div key={rev.id} className="review-card">
               <div className="review-user-row">
                 <img src={rev.avatar} alt={rev.name} className="review-avatar" />

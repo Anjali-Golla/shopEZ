@@ -147,7 +147,11 @@ const Cart = () => {
               <div key={prodId} className="cart-item-row">
                 {/* Image */}
                 <div className="cart-item-img-container">
-                  <img src={image} alt={name} />
+                   <img 
+                    src={image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                    alt={name} 
+                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                  />
                 </div>
 
                 {/* Info Column */}

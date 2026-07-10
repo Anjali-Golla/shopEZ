@@ -47,7 +47,9 @@ const Navbar = () => {
   }, []);
 
   // Compute total items quantity in cart dynamically
-  const cartCount = cartItems.reduce((acc, curr) => acc + curr.quantity, 0);
+  const cartCount = cartItems
+    .filter(item => item && item.product && item.product._id)
+    .reduce((acc, curr) => acc + curr.quantity, 0);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

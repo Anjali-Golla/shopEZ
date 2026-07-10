@@ -23,6 +23,15 @@ const getCart = async (req, res) => {
     if (!cart) {
       cart = await Cart.create({ user: req.user._id, items: [], totalPrice: 0 });
     }
+    
+    // Clean up stale items where product was deleted/not found from DB
+    const initialLength = cart.items.length;
+    cart.items = cart.items.filter(item => item.product);
+    if (cart.items.length !== initialLength) {
+      await recalculateCart(cart);
+      await cart.save();
+    }
+    
     res.json(cart);
   } catch (error) {
     res.status(500).json({ message: error.message });

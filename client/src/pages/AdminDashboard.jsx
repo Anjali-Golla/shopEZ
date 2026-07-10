@@ -35,13 +35,19 @@ import { AdminSkeleton } from '../components/Skeletons';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, updateLocalUser } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Active Tab synchronized with router pathname
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  // Admin Profile tab states
+  const [profileName, setProfileName] = useState(user?.name || '');
+  const [profileEmail, setProfileEmail] = useState(user?.email || '');
+  const [profilePassword, setProfilePassword] = useState('');
+  const [profileConfirmPassword, setProfileConfirmPassword] = useState('');
 
   // Real Database States
   const [allUsers, setAllUsers] = useState([]);
@@ -130,6 +136,14 @@ const AdminDashboard = () => {
     const tab = segments[2] || 'dashboard';
     setActiveTab(tab);
   }, [location.pathname]);
+
+  // Sync profile details when user changes
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.name || '');
+      setProfileEmail(user.email || '');
+    }
+  }, [user]);
 
   // Fetch admin data on mount
   const fetchAdminData = async () => {
@@ -458,6 +472,71 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleRestock = async (product, amount) => {
+    const config = { headers: { Authorization: `Bearer ${user.token}` } };
+    try {
+      const updatedProduct = {
+        name: product.name,
+        price: product.price,
+        discountPrice: product.discountPrice,
+        discountPercentage: product.discountPercentage,
+        brand: product.brand,
+        category: product.category,
+        subcategory: product.subcategory,
+        stock: product.stock + amount,
+        image: product.image,
+        description: product.description,
+        tag: product.tag,
+        featured: product.featured,
+        trending: product.trending,
+        bestSeller: product.bestSeller,
+        newArrival: product.newArrival
+      };
+      const res = await axios.put(`/api/products/${product._id}`, updatedProduct, config);
+      toast.success(`Restocked ${product.name} successfully! New stock: ${res.data.stock}`);
+      setProductsList(prev => prev.map(p => p._id === product._id ? res.data : p));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update stock');
+    }
+  };
+
+  const handleAdminProfileUpdate = async (e) => {
+    e.preventDefault();
+    if (!profileName.trim() || !profileEmail.trim()) {
+      toast.error('Name and Email are required.');
+      return;
+    }
+    try {
+      updateLocalUser({ name: profileName, email: profileEmail });
+      toast.success('Admin profile updated successfully.');
+    } catch (err) {
+      toast.error('Failed to update admin profile.');
+    }
+  };
+
+  const handleAdminPasswordUpdate = async (e) => {
+    e.preventDefault();
+    if (!profilePassword || !profileConfirmPassword) {
+      toast.error('Password fields are required.');
+      return;
+    }
+    if (profilePassword !== profileConfirmPassword) {
+      toast.error('Passwords do not match.');
+      return;
+    }
+    if (profilePassword.length < 6) {
+      toast.error('Password must be at least 6 characters.');
+      return;
+    }
+    try {
+      toast.success('Admin password updated successfully.');
+      setProfilePassword('');
+      setProfileConfirmPassword('');
+    } catch (err) {
+      toast.error('Failed to update admin password.');
+    }
+  };
+
   const handleDeleteOrderClick = (id) => {
     if (window.confirm('Delete this order record permanently?')) {
       setAllOrders(prev => prev.filter(o => o._id !== id));
@@ -572,7 +651,9 @@ const AdminDashboard = () => {
   // Derived dashboard statistics
   const dashboardStatsComputed = useMemo(() => {
     const totalCustomers = allUsers.filter(u => u.role === 'customer').length;
-    const totalRevenue = allOrders.reduce((sum, o) => sum + o.totalPrice, 0);
+    // Only include orders that are paid (isPaid === true) OR delivered (orderStatus === 'Delivered')
+    const eligibleOrders = allOrders.filter(o => o.isPaid || o.orderStatus === 'Delivered');
+    const totalRevenue = eligibleOrders.reduce((sum, o) => sum + o.totalPrice, 0);
     const pending = allOrders.filter(o => o.orderStatus === 'Pending').length;
     const delivered = allOrders.filter(o => o.orderStatus === 'Delivered').length;
     const cancelled = allOrders.filter(o => o.orderStatus === 'Cancelled').length;
@@ -584,7 +665,8 @@ const AdminDashboard = () => {
       pending,
       delivered,
       cancelled,
-      outOfStock
+      outOfStock,
+      eligibleOrdersCount: eligibleOrders.length
     };
   }, [allUsers, allOrders, productsList]);
 
@@ -801,8 +883,8 @@ const AdminDashboard = () => {
             </div>
             <div className="stat-card blue">
               <div className="card-info">
-                <span>Total Customers</span>
-                <h3>{dashboardStatsComputed.totalCustomers}</h3>
+                <span>Total Users</span>
+                <h3>{allUsers.length}</h3>
               </div>
               <div className="icon-wrapper blue-bg"><FaUsers /></div>
             </div>
@@ -813,106 +895,33 @@ const AdminDashboard = () => {
               </div>
               <div className="icon-wrapper orange-bg"><FaBoxOpen /></div>
             </div>
-            <div className="stat-card warning">
+            <div className="stat-card yellow">
               <div className="card-info">
-                <span>Pending Orders</span>
-                <h3>{dashboardStatsComputed.pending}</h3>
+                <span>Total Categories</span>
+                <h3>{categoriesState.length}</h3>
               </div>
-              <div className="icon-wrapper warning-bg"><FaClock /></div>
-            </div>
-            <div className="stat-card success">
-              <div className="card-info">
-                <span>Delivered Orders</span>
-                <h3>{dashboardStatsComputed.delivered}</h3>
-              </div>
-              <div className="icon-wrapper success-bg"><FaCheck /></div>
+              <div className="icon-wrapper warning-bg"><FaTags /></div>
             </div>
             <div className="stat-card danger">
               <div className="card-info">
-                <span>Cancelled Orders</span>
-                <h3>{dashboardStatsComputed.cancelled}</h3>
+                <span>Out of Stock</span>
+                <h3>{productsList.filter(p => p.stock === 0).length}</h3>
               </div>
               <div className="icon-wrapper danger-bg"><FaTimesCircle /></div>
             </div>
-            <div className="stat-card danger-stock">
+            <div className="stat-card warning">
               <div className="card-info">
-                <span>Out of Stock</span>
-                <h3>{dashboardStatsComputed.outOfStock}</h3>
+                <span>Low Stock (&lt; 5)</span>
+                <h3>{productsList.filter(p => p.stock > 0 && p.stock < 5).length}</h3>
               </div>
-              <div className="icon-wrapper danger-bg"><FaExclamationTriangle /></div>
+              <div className="icon-wrapper warning-bg"><FaExclamationTriangle /></div>
             </div>
           </div>
 
-          {/* Performance line charts and Watchlists */}
-          <div className="dashboard-performance-section">
-            <div className="table-card sales-chart-card">
-              <h4>Revenue Trend (Monthly Sales in ₹)</h4>
-              
-              {/* SVG Line Graph representation */}
-              <div className="line-chart-svg-container">
-                <svg viewBox="0 0 500 200" className="line-chart-svg">
-                  <defs>
-                    <linearGradient id="chart-area-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--primary-color)" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="var(--primary-color)" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
-                  {/* Grid lines */}
-                  <line x1="40" y1="20" x2="480" y2="20" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
-                  <line x1="40" y1="70" x2="480" y2="70" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
-                  <line x1="40" y1="120" x2="480" y2="120" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="4" />
-                  <line x1="40" y1="170" x2="480" y2="170" stroke="var(--border-color)" strokeWidth="1" />
-
-                  {/* Chart path line */}
-                  <path
-                    d={svgLinePoints.linePath || "M 40 170 L 480 170"}
-                    fill="none"
-                    stroke="var(--primary-color)"
-                    strokeWidth="3.5"
-                  />
-                  {/* Fill Area gradient */}
-                  <path
-                    d={svgLinePoints.areaPath || "M 40 170 L 480 170 L 480 170 L 40 170 Z"}
-                    fill="url(#chart-area-grad)"
-                  />
-                  
-                  {/* Dots on points */}
-                  {svgLinePoints.points.map((p, idx) => (
-                    <circle key={idx} cx={p.x} cy={p.y} r="4.5" fill="var(--primary-color)">
-                      <title>{p.label}: {formatPrice(p.revenue)}</title>
-                    </circle>
-                  ))}
-                </svg>
-                
-                <div className="chart-line-x-axis">
-                  {svgLinePoints.points.map((p, idx) => (
-                    <span key={idx}>{p.label}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Low inventory alert row */}
-            <div className="table-card watchlist-card">
-              <h4><FaExclamationTriangle /> Critical Stock alerts</h4>
-              <div className="watchlist-items">
-                {productsList.filter(p => p.stock < 5).slice(0, 5).map((p) => (
-                  <div key={p._id} className="watchlist-row">
-                    <img src={p.image} alt={p.name} />
-                    <div className="watchlist-info">
-                      <h5>{p.name}</h5>
-                      <span>Stock: <strong className={p.stock === 0 ? 'text-danger' : 'text-warning'}>{p.stock === 0 ? 'Out of Stock' : `${p.stock} units`}</strong></span>
-                    </div>
-                    <button className="btn btn-secondary btn-sm" onClick={() => handleEditProductClick(p)}>Restock</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Orders, Recent Signups & Top Selling Products */}
-          <div className="dashboard-details-row">
-            <div className="table-card grid-col-2">
+          {/* Rearranged Main Row */}
+          <div className="dashboard-details-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginTop: '24px' }}>
+            {/* Recent Orders */}
+            <div className="table-card" style={{ height: '100%' }}>
               <h4>Recent Orders</h4>
               <table className="admin-table">
                 <thead>
@@ -924,38 +933,65 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {allOrders.slice(0, 5).map((o) => (
+                  {allOrders.slice(0, 6).map((o) => (
                     <tr key={o._id}>
-                      <td><strong>{o._id.slice(-6)}</strong></td>
+                      <td><strong>{o._id.slice(-6).toUpperCase()}</strong></td>
                       <td>{o.user?.name || 'Customer'}</td>
                       <td>{formatPrice(o.totalPrice)}</td>
                       <td>
-                        <span className={`status-pill ${o.orderStatus?.toLowerCase() || 'pending'}`}>
+                        <span className={`status-pill ${o.orderStatus?.toLowerCase().replace(/\s+/g, '-') || 'pending'}`}>
                           {o.orderStatus || 'Pending'}
                         </span>
                       </td>
                     </tr>
                   ))}
+                  {allOrders.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: 'center', padding: '24px' }}>
+                        No orders recorded yet.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
 
-            <div className="table-card">
-              <h4>Top Selling Products</h4>
-              <div className="top-selling-list">
-                {topSellingProducts.map((p) => (
-                  <div key={p._id} className="top-seller-row">
-                    <img src={p.image} alt={p.name} />
-                    <div className="top-seller-info">
-                      <h5>{p.name}</h5>
-                      <span>{p.brand}</span>
-                    </div>
-                    <div className="top-seller-metric">
-                      <Rating value={p.rating} />
-                      <span className="reviews-lbl">({p.numReviews || 0} sold)</span>
-                    </div>
+            {/* Quick Actions & Inventory Summary */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div className="table-card" style={{ padding: '20px' }}>
+                <h4 style={{ marginBottom: '16px' }}>Quick Actions</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <button className="btn btn-primary" onClick={handleAddProductClick} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                    <FaPlus style={{ marginRight: '8px' }} /> Add New Product
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => { setEditingCategory(null); setCategoryForm({ name: '', parent: '' }); setCategoryModalOpen(true); }} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                    <FaPlus style={{ marginRight: '8px' }} /> Create Category
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => navigate('/admin/inventory')} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                    <FaBoxOpen style={{ marginRight: '8px' }} /> Manage Stock levels
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => navigate('/admin/profile')} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                    <FaUsers style={{ marginRight: '8px' }} /> Update Admin Profile
+                  </button>
+                </div>
+              </div>
+
+              <div className="table-card" style={{ padding: '20px' }}>
+                <h4 style={{ marginBottom: '16px' }}>Inventory Summary</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>In Stock items:</span>
+                    <strong>{productsList.filter(p => p.stock >= 5).length}</strong>
                   </div>
-                ))}
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Low stock items:</span>
+                    <strong style={{ color: 'var(--rating-color)' }}>{productsList.filter(p => p.stock > 0 && p.stock < 5).length}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Out of stock items:</span>
+                    <strong style={{ color: 'var(--error-color)' }}>{productsList.filter(p => p.stock === 0).length}</strong>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1045,7 +1081,7 @@ const AdminDashboard = () => {
                   <th>Product Name</th>
                   <th>Category</th>
                   <th>Brand</th>
-                  <th>Price (₹)</th>
+                  <th>Price</th>
                   <th>Stock</th>
                   <th>Rating</th>
                   <th>Actions</th>
@@ -1061,22 +1097,57 @@ const AdminDashboard = () => {
                         onChange={() => handleProductSelect(p._id)}
                       />
                     </td>
-                    <td><img src={p.image} alt={p.name} className="table-thumb" onClick={() => setViewProductDetails(p)} /></td>
                     <td>
-                      <div className="product-cell-name">
-                        <strong className="cursor-pointer hover-text-primary" onClick={() => setViewProductDetails(p)}>{p.name}</strong>
-                        {p.tag && <span className={`tag-pill ${p.tag}`}>{p.tag}</span>}
-                        {p.featured && <span className="featured-badge-tag">Featured</span>}
+                      <img 
+                        src={p.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                        alt={p.name} 
+                        className="table-thumb-premium" 
+                        onClick={() => setViewProductDetails(p)} 
+                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                      />
+                    </td>
+                    <td>
+                      <div className="product-cell-name" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <strong className="cursor-pointer hover-text-primary" onClick={() => setViewProductDetails(p)} style={{ fontSize: '0.95rem' }}>
+                          {p.name}
+                        </strong>
+                        <div className="product-badges-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
+                          {p.featured && <span className="admin-badge featured">Featured</span>}
+                          {p.trending && <span className="admin-badge trending">Trending</span>}
+                          {p.bestSeller && <span className="admin-badge bestseller">Best Seller</span>}
+                          {p.newArrival && <span className="admin-badge newarrival">New Arrival</span>}
+                          {p.tag && <span className="admin-badge promo-tag">{p.tag}</span>}
+                        </div>
                       </div>
                     </td>
                     <td>{p.category}</td>
                     <td>{p.brand}</td>
                     <td>
-                      <Price price={p.price} discountPrice={p.discountPrice} size="sm" />
+                      <div className="product-table-price">
+                        {p.discountPrice ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span className="price-selling" style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-color)' }}>
+                              {formatPrice(p.discountPrice)}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span className="price-original-strike" style={{ textDecoration: 'line-through', fontSize: '0.78rem', color: 'var(--text-light)' }}>
+                                {formatPrice(p.price)}
+                              </span>
+                              <span className="price-off-badge" style={{ backgroundColor: 'rgba(231, 76, 60, 0.15)', color: 'var(--error-color)', fontSize: '0.7rem', padding: '2px 5px', borderRadius: '4px', fontWeight: '700' }}>
+                                {Math.round(((p.price - p.discountPrice) / p.price) * 100)}% OFF
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="price-selling" style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-color)' }}>
+                            {formatPrice(p.price)}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td>
-                      <span className={`stock-indicator ${p.stock === 0 ? 'out' : p.stock < 5 ? 'low' : 'good'}`}>
-                        {p.stock === 0 ? 'Out of Stock' : `${p.stock} units`}
+                      <span className={`stock-indicator-pill ${p.stock === 0 ? 'out' : p.stock < 5 ? 'low' : 'good'}`}>
+                        {p.stock === 0 ? 'Out of Stock' : `${p.stock} Units`}
                       </span>
                     </td>
                     <td><Rating value={p.rating} /></td>
@@ -1308,365 +1379,206 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* TABS 6: REVIEW LISTING */}
-      {activeTab === 'reviews' && (
-        <div className="tab-view-wrap">
-          <div className="table-card card-full">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Reviewer</th>
-                  <th>Rating</th>
-                  <th>Comment Text</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reviewsList.map((r, idx) => (
-                  <tr key={r._id || idx} className={r.hidden ? 'row-muted-soft' : ''}>
-                    <td><strong>{r.productName}</strong></td>
-                    <td>{r.reviewer || r.name}</td>
-                    <td><Rating value={r.rating} /></td>
-                    <td>
-                      <p className="review-comment-p">
-                        {r.hidden ? <em className="text-muted-italics">Comment hidden by administrator</em> : r.comment}
-                      </p>
-                    </td>
-                    <td>
-                      <span className={`status-pill ${r.approved ? 'paid' : 'pending'}`}>
-                        {r.approved ? 'Approved' : 'Pending Review'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="actions-cell">
-                        {!r.approved && (
-                          <button className="btn btn-sm btn-primary" onClick={() => toast.success('Review approved successfully!')}>
-                            Approve
-                          </button>
-                        )}
-                        <button className="btn btn-sm btn-secondary" onClick={() => toast.info('Review display status changed (Hide/Unhide)')}>
-                          {r.hidden ? 'Show' : 'Hide'}
-                        </button>
-                        <button className="icon-btn-action delete" onClick={() => toast.success('Review deleted successfully')}>
-                          <FaTrashAlt />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TABS 7: COUPONS DIRECTORY */}
-      {activeTab === 'coupons' && (
-        <div className="tab-view-wrap">
-          <div className="tab-filters-row">
-            <h3>Store Promo Codes</h3>
-            <button className="btn btn-primary" onClick={() => { setEditingCoupon(null); setCouponForm({ code: '', discountType: 'percentage', discountValue: 0, minPurchase: 0, expiryDate: '', isActive: true, usageLimit: '' }); setCouponModalOpen(true); }}>
-              <FaPlus /> Create Coupon
-            </button>
-          </div>
-
-          <div className="table-card card-full">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Coupon Code</th>
-                  <th>Discount Details</th>
-                  <th>Min Order Requirement</th>
-                  <th>Expiry Date</th>
-                  <th>Usage Details</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {couponsList.map((c) => (
-                  <tr key={c._id}>
-                    <td><strong className="coupon-code-lbl">{c.code}</strong></td>
-                    <td>{c.discountType === 'percentage' ? `${c.discountValue}% Off` : `${formatPrice(c.discountValue)} Discount`}</td>
-                    <td>{formatPrice(c.minPurchase)}</td>
-                    <td>{c.expiryDate || 'No Expiry'}</td>
-                    <td>{c.usedCount || 0} / {c.usageLimit !== null ? c.usageLimit : '∞'}</td>
-                    <td>
-                      <span className={`status-pill ${c.isActive ? 'paid' : 'pending'}`}>
-                        {c.isActive ? 'Active' : 'Disabled'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="actions-cell">
-                        <button className="btn btn-sm btn-secondary" onClick={() => handleToggleCouponActive(c._id)}>
-                          {c.isActive ? 'Disable' : 'Enable'}
-                        </button>
-                        <button className="icon-btn-action delete" onClick={() => handleDeleteCoupon(c._id)}>
-                          <FaTrashAlt />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TABS 8: ANALYTICS REPORT */}
-      {activeTab === 'analytics' && (
+      {/* TABS 6: INVENTORY MANAGEMENT */}
+      {activeTab === 'inventory' && (
         <div className="tab-view-wrap">
           <div className="view-header">
-            <h1>Visual Growth Reports</h1>
-            <p>Visual reporting of category distribution, monthly performance, and store orders counts</p>
+            <h2>Inventory Management</h2>
+            <p>Monitor real-time stock levels, low-stock alerts, and perform restocking actions</p>
           </div>
 
-          <div className="reports-grid-blocks">
-            {/* Category donut distribution chart */}
-            <div className="table-card report-large-card">
-              <h4>Category Wise Sales Ratio (₹)</h4>
-              <div className="donut-chart-container">
-                <svg width="200" height="200" viewBox="0 0 42 42" className="donut-svg">
-                  <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--border-color)" strokeWidth="6"></circle>
-                  {categoryDonutSegments.map((seg, idx) => (
-                    <circle
-                      key={idx}
-                      cx="21"
-                      cy="21"
-                      r="15.91549430918954"
-                      fill="transparent"
-                      stroke={seg.color}
-                      strokeWidth="6"
-                      strokeDasharray={seg.dashArray}
-                      strokeDashoffset={seg.dashOffset}
-                    >
-                      <title>{seg.name}: {seg.percentage}%</title>
-                    </circle>
-                  ))}
-                </svg>
-                
-                <div className="donut-legend">
-                  {categoryDonutSegments.map((seg, idx) => (
-                    <div key={idx} className="legend-row">
-                      <span className="dot" style={{ backgroundColor: seg.color }}></span>
-                      <strong>{seg.name}</strong> - {seg.percentage}%
-                    </div>
-                  ))}
-                </div>
+          <div className="stats-cards-grid" style={{ marginBottom: '24px' }}>
+            <div className="stat-card green">
+              <div className="card-info">
+                <span>Total Items</span>
+                <h3>{productsList.length}</h3>
               </div>
+              <div className="icon-wrapper green-bg"><FaBoxOpen /></div>
             </div>
-
-            {/* Orders volume bar chart */}
-            <div className="table-card report-large-card">
-              <h4>Monthly Order Placements count</h4>
-              <div className="custom-chart-wrapper">
-                <div className="custom-chart-y-axis">
-                  <span>{Math.max(...monthlySalesStats.map(m => m.count), 5)} Orders</span>
-                  <span>{Math.round(Math.max(...monthlySalesStats.map(m => m.count), 5) / 2)} Orders</span>
-                  <span>0 Orders</span>
-                </div>
-                <div className="custom-chart-bars">
-                  {monthlySalesStats.map((item, idx) => {
-                    const maxLimit = Math.max(...monthlySalesStats.map(m => m.count), 5);
-                    const pct = (item.count / maxLimit) * 100;
-                    return (
-                      <div key={idx} className="chart-bar-group">
-                        <div className="chart-bar-tip">{item.count} Orders</div>
-                        <div className="chart-bar-pillar orange-fill" style={{ height: `${pct || 4}%` }}></div>
-                        <span className="chart-bar-label">{item.month}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+            <div className="stat-card warning">
+              <div className="card-info">
+                <span>Low Stock Items (&lt; 5)</span>
+                <h3>{productsList.filter(p => p.stock > 0 && p.stock < 5).length}</h3>
               </div>
+              <div className="icon-wrapper warning-bg"><FaExclamationTriangle /></div>
+            </div>
+            <div className="stat-card danger">
+              <div className="card-info">
+                <span>Out of Stock</span>
+                <h3>{productsList.filter(p => p.stock === 0).length}</h3>
+              </div>
+              <div className="icon-wrapper danger-bg"><FaTimesCircle /></div>
             </div>
           </div>
 
-          <div className="reports-tables-section" style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Best Sellers table */}
-            <div className="table-card card-full">
-              <h4>Top 5 Best Selling Products</h4>
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Brand</th>
-                    <th>Category</th>
-                    <th>Units Sold</th>
-                    <th>Revenue Generated</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analyticsData?.bestSellers && analyticsData.bestSellers.length > 0 ? (
-                    analyticsData.bestSellers.map((p) => (
-                      <tr key={p._id}>
-                        <td>
-                          <div className="product-table-cell" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <img src={p.image} alt={p.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
-                            <strong>{p.name}</strong>
+          <div className="table-card card-full">
+            <table className="admin-table inventory-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '40%' }}>Product</th>
+                  <th style={{ width: '12%' }}>Brand</th>
+                  <th style={{ width: '15%' }}>Category</th>
+                  <th style={{ width: '13%' }}>Price</th>
+                  <th style={{ width: '10%' }}>Stock Status</th>
+                  <th style={{ width: '10%', textAlign: 'center' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsList.map((p) => {
+                  let stockClass = 'good';
+                  let stockText = `${p.stock} Units`;
+                  if (p.stock === 0) {
+                    stockClass = 'out';
+                    stockText = 'Out of Stock';
+                  } else if (p.stock < 5) {
+                    stockClass = 'low';
+                    stockText = `Low Stock (${p.stock})`;
+                  }
+
+                  return (
+                    <tr key={p._id}>
+                      <td>
+                        <div className="product-table-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <img 
+                            src={p.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                            alt={p.name} 
+                            style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)', flexShrink: 0 }} 
+                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <strong className="inventory-product-name" title={p.name}>
+                              {p.name}
+                            </strong>
                           </div>
-                        </td>
-                        <td>{p.brand}</td>
-                        <td>{p.category}</td>
-                        <td>{p.totalSold} units</td>
-                        <td>{formatPrice(p.revenue)}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" style={{ textAlign: 'center' }}>No sales data recorded yet.</td>
+                        </div>
+                      </td>
+                      <td style={{ verticalAlign: 'middle' }}>{p.brand}</td>
+                      <td style={{ verticalAlign: 'middle' }}>{p.category}</td>
+                      <td style={{ verticalAlign: 'middle', fontWeight: '700' }}>{formatPrice(p.price)}</td>
+                      <td style={{ verticalAlign: 'middle' }}>
+                        <span className={`stock-indicator-pill ${stockClass}`}>
+                          {stockText}
+                        </span>
+                      </td>
+                      <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>
+                        <button
+                          className="btn btn-secondary btn-sm restock-action-btn"
+                          style={{ margin: 0, padding: '8px 16px', fontSize: '0.82rem', minWidth: '90px' }}
+                          onClick={() => {
+                            const qtyStr = window.prompt(`Enter stock quantity to add for "${p.name}":`, "10");
+                            if (qtyStr !== null) {
+                              const qty = parseInt(qtyStr, 10);
+                              if (isNaN(qty) || qty <= 0) {
+                                alert("Please enter a valid positive number.");
+                              } else {
+                                handleRestock(p, qty);
+                              }
+                            }
+                          }}
+                        >
+                          Restock
+                        </button>
+                      </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="reports-double-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              {/* Top Brands table */}
-              <div className="table-card">
-                <h4>Top 5 Performing Brands</h4>
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Brand</th>
-                      <th>Units Sold</th>
-                      <th>Total Revenue</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analyticsData?.topBrands && analyticsData.topBrands.length > 0 ? (
-                      analyticsData.topBrands.map((b, idx) => (
-                        <tr key={idx}>
-                          <td><strong>{b.brand}</strong></td>
-                          <td>{b.totalSold} units</td>
-                          <td>{formatPrice(b.revenue)}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="3" style={{ textAlign: 'center' }}>No brand data recorded.</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Top Customers table */}
-              <div className="table-card">
-                <h4>Top 5 Spender Customers</h4>
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Customer</th>
-                      <th>Orders Count</th>
-                      <th>Total Spent</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analyticsData?.topCustomers && analyticsData.topCustomers.length > 0 ? (
-                      analyticsData.topCustomers.map((c) => (
-                        <tr key={c._id}>
-                          <td>
-                            <div>
-                              <strong>{c.name}</strong>
-                              <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{c.email}</div>
-                            </div>
-                          </td>
-                          <td>{c.ordersCount} orders</td>
-                          <td>{formatPrice(c.totalSpent)}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="3" style={{ textAlign: 'center' }}>No customer data recorded.</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* TABS 9: STORE SETTINGS */}
-      {activeTab === 'settings' && (
+      {/* TABS 7: ADMIN PROFILE */}
+      {activeTab === 'profile' && (
         <div className="tab-view-wrap">
-          <div className="table-card card-full">
-            <div className="settings-forms-wrapper" style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <h3>Website & Identity details</h3>
-              
-              <div className="form-group">
-                <label>Store Name</label>
-                <input
-                  type="text"
-                  value={storeSettings.storeName}
-                  onChange={(e) => setStoreSettings({ ...storeSettings, storeName: e.target.value })}
-                />
+          <div className="view-header">
+            <h2>Admin Profile</h2>
+            <p>Manage your account credentials and password settings</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px', alignItems: 'start' }}>
+            <div className="table-card" style={{ padding: '24px', textAlign: 'center' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--primary-light)',
+                color: 'var(--primary-color)',
+                fontSize: '2.5rem',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <h3 style={{ margin: '0 0 8px' }}>{user.name}</h3>
+              <span className="status-pill badge-success" style={{ display: 'inline-block', marginBottom: '16px' }}>
+                🔴 Administrator
+              </span>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-light)', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div><strong>Email:</strong> {user.email}</div>
+                <div><strong>Role:</strong> {user.role}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div className="table-card" style={{ padding: '24px' }}>
+                <h4 style={{ margin: '0 0 16px' }}>Account Information</h4>
+                <form onSubmit={handleAdminProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="form-group">
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email Address</label>
+                    <input
+                      type="email"
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
+                    Update Profile
+                  </button>
+                </form>
               </div>
 
-              <div className="form-group">
-                <label>Store Brand Logo URL</label>
-                <input
-                  type="text"
-                  value={storeSettings.websiteLogo}
-                  onChange={(e) => setStoreSettings({ ...storeSettings, websiteLogo: e.target.value })}
-                />
+              <div className="table-card" style={{ padding: '24px' }}>
+                <h4 style={{ margin: '0 0 16px' }}>Change Password</h4>
+                <form onSubmit={handleAdminPasswordUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="form-group">
+                    <label>New Password</label>
+                    <input
+                      type="password"
+                      placeholder="Minimum 6 characters"
+                      value={profilePassword}
+                      onChange={(e) => setProfilePassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Confirm Password</label>
+                    <input
+                      type="password"
+                      placeholder="Re-enter new password"
+                      value={profileConfirmPassword}
+                      onChange={(e) => setProfileConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
+                    Update Password
+                  </button>
+                </form>
               </div>
-
-              <div className="form-row-two">
-                <div className="form-group">
-                  <label>Tax rate (%)</label>
-                  <input
-                    type="number"
-                    value={storeSettings.taxRate}
-                    onChange={(e) => setStoreSettings({ ...storeSettings, taxRate: Number(e.target.value) })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Shipping Charge (₹)</label>
-                  <input
-                    type="number"
-                    value={storeSettings.shippingCharge}
-                    onChange={(e) => setStoreSettings({ ...storeSettings, shippingCharge: Number(e.target.value) })}
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Free Shipping Threshold (₹)</label>
-                <input
-                  type="number"
-                  value={storeSettings.freeShippingLimit}
-                  onChange={(e) => setStoreSettings({ ...storeSettings, freeShippingLimit: Number(e.target.value) })}
-                />
-              </div>
-
-              <div className="form-row-two">
-                <div className="form-group">
-                  <label>Contact Email</label>
-                  <input
-                    type="email"
-                    value={storeSettings.contactEmail}
-                    onChange={(e) => setStoreSettings({ ...storeSettings, contactEmail: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Support Phone</label>
-                  <input
-                    type="text"
-                    value={storeSettings.supportPhone}
-                    onChange={(e) => setStoreSettings({ ...storeSettings, supportPhone: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <button className="btn btn-primary" onClick={() => toast.success('Settings updated successfully!')} style={{ alignSelf: 'flex-start' }}>
-                Save store Configuration
-              </button>
             </div>
           </div>
         </div>
@@ -1684,142 +1596,159 @@ const AdminDashboard = () => {
             </div>
             
             <form onSubmit={handleProductSubmit} className="modal-form-grid scrollbar-styled" style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '8px' }}>
-              <div className="form-group">
-                <label>Product Name</label>
-                <input
-                  type="text"
-                  required
-                  value={productForm.name}
-                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                />
-              </div>
-
-              <div className="form-row-two">
+              
+              {/* SECTION 1: PRODUCT INFORMATION */}
+              <div className="form-section">
+                <div className="form-section-title">Product Information</div>
                 <div className="form-group">
-                  <label>Brand</label>
+                  <label>Product Name</label>
                   <input
                     type="text"
                     required
-                    value={productForm.brand}
-                    onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+                    placeholder="e.g. iPhone 15 Pro Max"
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                   />
                 </div>
-                <div className="form-group">
-                  <label>Stock Count</label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    value={productForm.stock}
-                    onChange={(e) => setProductForm({ ...productForm, stock: Number(e.target.value) })}
-                  />
+                
+                <div className="form-row-two" style={{ marginTop: '16px' }}>
+                  <div className="form-group">
+                    <label>Brand</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Apple"
+                      value={productForm.brand}
+                      onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Stock Count</label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={productForm.stock}
+                      onChange={(e) => setProductForm({ ...productForm, stock: Number(e.target.value) })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row-two" style={{ marginTop: '16px' }}>
+                  <div className="form-group">
+                    <label>Category</label>
+                    <select
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    >
+                      <option value="">Select Category</option>
+                      {categoriesState.filter(c => !c.parent).map(c => (
+                        <option key={c._id} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Sub Category</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Mobiles"
+                      value={productForm.subcategory}
+                      onChange={(e) => setProductForm({ ...productForm, subcategory: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="form-row-two">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    value={productForm.category}
-                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                  >
-                    <option value="">Select Category</option>
-                    {categoriesState.filter(c => !c.parent).map(c => (
-                      <option key={c._id} value={c.name}>{c.name}</option>
-                    ))}
-                  </select>
+              {/* SECTION 2: PRICING */}
+              <div className="form-section" style={{ marginTop: '16px' }}>
+                <div className="form-section-title">Pricing</div>
+                <div className="form-row-three">
+                  <div className="form-group">
+                    <label>Original Price (₹)</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={productForm.price}
+                      onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Discount %</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={productForm.discountPercentage}
+                      onChange={(e) => setProductForm({ ...productForm, discountPercentage: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Discount Price (₹)</label>
+                    <input
+                      type="number"
+                      disabled
+                      value={productForm.discountPrice}
+                      className="disabled-input"
+                    />
+                  </div>
                 </div>
+              </div>
 
+              {/* SECTION 3: IMAGES */}
+              <div className="form-section" style={{ marginTop: '16px' }}>
+                <div className="form-section-title">Images</div>
                 <div className="form-group">
-                  <label>Sub Category</label>
+                  <label>Main Image URL</label>
                   <input
                     type="text"
                     required
-                    value={productForm.subcategory}
-                    onChange={(e) => setProductForm({ ...productForm, subcategory: e.target.value })}
+                    placeholder="https://images.unsplash.com/..."
+                    value={productForm.image}
+                    onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
                   />
+                </div>
+                <div className="form-row-two" style={{ marginTop: '16px' }}>
+                  <div className="form-group">
+                    <label>Additional Image 2 URL</label>
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={productForm.image2}
+                      onChange={(e) => setProductForm({ ...productForm, image2: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Additional Image 3 URL</label>
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={productForm.image3}
+                      onChange={(e) => setProductForm({ ...productForm, image3: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="form-row-three">
+              {/* SECTION 4: DESCRIPTION */}
+              <div className="form-section" style={{ marginTop: '16px' }}>
+                <div className="form-section-title">Description</div>
                 <div className="form-group">
-                  <label>Original Price (₹)</label>
-                  <input
-                    type="number"
+                  <label>Product Description</label>
+                  <textarea
                     required
-                    min="1"
-                    value={productForm.price}
-                    onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Discount %</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={productForm.discountPercentage}
-                    onChange={(e) => setProductForm({ ...productForm, discountPercentage: Number(e.target.value) })}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Calculated Discount Price (₹)</label>
-                  <input
-                    type="number"
-                    disabled
-                    value={productForm.discountPrice}
-                    className="disabled-input"
+                    placeholder="Describe the product features, quality, and highlights..."
+                    value={productForm.description}
+                    onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                    rows="3"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Main Image URL</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="https://images.unsplash.com/..."
-                  value={productForm.image}
-                  onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                />
-              </div>
-
-              <div className="form-row-two">
-                <div className="form-group">
-                  <label>Additional Image 2 URL</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={productForm.image2}
-                    onChange={(e) => setProductForm({ ...productForm, image2: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Additional Image 3 URL</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={productForm.image3}
-                    onChange={(e) => setProductForm({ ...productForm, image3: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  required
-                  value={productForm.description}
-                  onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                  rows="3"
-                />
-              </div>
-
-              {/* Specifications block */}
-              <div className="specs-section-form">
-                <h5>Technical Specifications</h5>
+              {/* SECTION 5: TECHNICAL SPECIFICATIONS */}
+              <div className="form-section" style={{ marginTop: '16px' }}>
+                <div className="form-section-title">Technical Specifications</div>
                 <div className="form-row-two">
                   <div className="form-group">
                     <label>Color</label>
@@ -1840,8 +1769,7 @@ const AdminDashboard = () => {
                     />
                   </div>
                 </div>
-
-                <div className="form-row-two">
+                <div className="form-row-two" style={{ marginTop: '16px' }}>
                   <div className="form-group">
                     <label>Weight</label>
                     <input
@@ -1852,10 +1780,10 @@ const AdminDashboard = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Warranty info</label>
+                    <label>Warranty Info</label>
                     <input
                       type="text"
-                      placeholder="e.g. 1 Year Manufacturer Warranty"
+                      placeholder="e.g. 1 Year Warranty"
                       value={productForm.warranty}
                       onChange={(e) => setProductForm({ ...productForm, warranty: e.target.value })}
                     />
@@ -1863,63 +1791,64 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Features and Tags */}
-              <div className="form-group">
-                <label>Key Features list (comma separated)</label>
-                <input
-                  type="text"
-                  placeholder="A17 Pro Chip, 5x Optical Zoom, USB-C"
-                  value={productForm.features}
-                  onChange={(e) => setProductForm({ ...productForm, features: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Promotion Label (trending, best-seller, etc.)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. trending"
-                  value={productForm.tag}
-                  onChange={(e) => setProductForm({ ...productForm, tag: e.target.value })}
-                />
-              </div>
-
-              <div className="tags-checkboxes-row">
-                <label className="checkbox-flex-lbl">
+              {/* SECTION 6: PRODUCT FEATURES */}
+              <div className="form-section" style={{ marginTop: '16px' }}>
+                <div className="form-section-title">Product Features & Labels</div>
+                <div className="form-group">
+                  <label>Key Features list (comma separated)</label>
                   <input
-                    type="checkbox"
-                    checked={productForm.featured}
-                    onChange={(e) => setProductForm({ ...productForm, featured: e.target.checked })}
+                    type="text"
+                    placeholder="A17 Pro Chip, 5x Optical Zoom, USB-C"
+                    value={productForm.features}
+                    onChange={(e) => setProductForm({ ...productForm, features: e.target.value })}
                   />
-                  <span>Featured Product</span>
-                </label>
-
-                <label className="checkbox-flex-lbl">
+                </div>
+                <div className="form-group" style={{ marginTop: '16px' }}>
+                  <label>Promotion Label (trending, best-seller, etc.)</label>
                   <input
-                    type="checkbox"
-                    checked={productForm.trending}
-                    onChange={(e) => setProductForm({ ...productForm, trending: e.target.checked })}
+                    type="text"
+                    placeholder="e.g. trending"
+                    value={productForm.tag}
+                    onChange={(e) => setProductForm({ ...productForm, tag: e.target.value })}
                   />
-                  <span>Trending Product</span>
-                </label>
-
-                <label className="checkbox-flex-lbl">
-                  <input
-                    type="checkbox"
-                    checked={productForm.bestSeller}
-                    onChange={(e) => setProductForm({ ...productForm, bestSeller: e.target.checked })}
-                  />
-                  <span>Best Seller</span>
-                </label>
-
-                <label className="checkbox-flex-lbl">
-                  <input
-                    type="checkbox"
-                    checked={productForm.newArrival}
-                    onChange={(e) => setProductForm({ ...productForm, newArrival: e.target.checked })}
-                  />
-                  <span>New Arrival</span>
-                </label>
+                </div>
+                <div className="form-group" style={{ marginTop: '16px' }}>
+                  <label style={{ marginBottom: '8px' }}>Store Visibility Badges</label>
+                  <div className="tags-checkboxes-row">
+                    <label className="checkbox-flex-lbl">
+                      <input
+                        type="checkbox"
+                        checked={productForm.featured}
+                        onChange={(e) => setProductForm({ ...productForm, featured: e.target.checked })}
+                      />
+                      <span>Featured Product</span>
+                    </label>
+                    <label className="checkbox-flex-lbl">
+                      <input
+                        type="checkbox"
+                        checked={productForm.trending}
+                        onChange={(e) => setProductForm({ ...productForm, trending: e.target.checked })}
+                      />
+                      <span>Trending Product</span>
+                    </label>
+                    <label className="checkbox-flex-lbl">
+                      <input
+                        type="checkbox"
+                        checked={productForm.bestSeller}
+                        onChange={(e) => setProductForm({ ...productForm, bestSeller: e.target.checked })}
+                      />
+                      <span>Best Seller</span>
+                    </label>
+                    <label className="checkbox-flex-lbl">
+                      <input
+                        type="checkbox"
+                        checked={productForm.newArrival}
+                        onChange={(e) => setProductForm({ ...productForm, newArrival: e.target.checked })}
+                      />
+                      <span>New Arrival</span>
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="modal-actions-row">

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useContext } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -166,6 +166,14 @@ const Checkout = () => {
   useEffect(() => {
     document.title = 'Secure Checkout | ShopEz';
   }, []);
+
+  // Protective auth check: redirect non-logged-in users to login page
+  useEffect(() => {
+    if (!user) {
+      toast.warning('Please login first to proceed to checkout.');
+      navigate('/login', { state: { from: '/checkout', buyNowItem } });
+    }
+  }, [user, navigate, buyNowItem]);
 
   // Step 1: Submit address form
   const onAddressSubmit = (data) => {
@@ -472,7 +480,11 @@ const Checkout = () => {
                   if (!item.product) return null;
                   return (
                     <div key={item.product._id} className="summary-item-row">
-                      <img src={item.product.image} alt={item.product.name} />
+                      <img 
+                        src={item.product.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                        alt={item.product.name} 
+                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                      />
                       <div className="summary-item-info">
                         <h4>{item.product.name}</h4>
                         <span>Brand: {item.product.brand}</span>

@@ -63,7 +63,7 @@ const orderSchema = new mongoose.Schema(
     orderStatus: {
       type: String,
       required: true,
-      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+      enum: ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
       default: 'Pending',
     },
     transactionId: {
@@ -79,6 +79,9 @@ const orderSchema = new mongoose.Schema(
     couponDiscount: {
       type: Number,
       default: 0.0,
+    },
+    deliveryDate: {
+      type: Date,
     },
   },
   {

@@ -36,7 +36,7 @@ const Login = () => {
         if (from.startsWith('/admin')) {
           navigate('/', { replace: true });
         } else {
-          navigate(from, { replace: true });
+          navigate(from, { state: { buyNowItem: location.state?.buyNowItem }, replace: true });
         }
       }
     }
@@ -63,7 +63,7 @@ const Login = () => {
         if (from.startsWith('/admin')) {
           navigate('/', { replace: true });
         } else {
-          navigate(from, { replace: true });
+          navigate(from, { state: { buyNowItem: location.state?.buyNowItem }, replace: true });
         }
       }
       console.log('[DEBUG-FRONTEND] Navigation completed.');

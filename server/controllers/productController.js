@@ -1,6 +1,20 @@
-const normalizeCategoryString = (str) => {
-  if (!str) return '';
-  return str.trim().toLowerCase().replace(/['’\s-]/g, '');
+const Product = require('../models/Product');
+const Category = require('../models/Category');
+
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const parseMultiParam = (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) {
+    return val
+      .flatMap(item => String(item).split(','))
+      .map(item => item.trim())
+      .filter(item => item && item.toLowerCase() !== 'all');
+  }
+  return String(val)
+    .split(',')
+    .map(item => item.trim())
+    .filter(item => item && item.toLowerCase() !== 'all');
 };
 
 // @desc    Fetch all products
@@ -11,11 +25,14 @@ const getProducts = async (req, res) => {
     const {
       search,
       category,
+      categories,
       brand,
+      brands,
       minPrice,
       maxPrice,
       rating,
       stock,
+      discount,
       sort,
       featured,
       trending,
@@ -27,26 +44,42 @@ const getProducts = async (req, res) => {
 
     const query = {};
 
-    // 1. Search / Keyword Match (Name, Brand, Description)
+    // 1. Search / Keyword Match (Name, Brand, Description, Category)
     if (search && search.trim() !== '') {
       query.$or = [
         { name: { $regex: search.trim(), $options: 'i' } },
         { brand: { $regex: search.trim(), $options: 'i' } },
         { description: { $regex: search.trim(), $options: 'i' } },
+        { category: { $regex: search.trim(), $options: 'i' } },
       ];
     }
 
-    // 2. Category Filter
-    if (category && category !== 'all' && category.trim() !== '') {
-      const targetNorm = normalizeCategoryString(category);
-      const allCategories = await Product.distinct('category');
-      const matchedCategories = allCategories.filter(c => normalizeCategoryString(c) === targetNorm);
+    // 2. Multi-Select Category Filter ($in)
+    const rawCategories = parseMultiParam(categories || category);
+    if (rawCategories.length > 0) {
+      const dbCategories = await Category.find({});
+      const searchCategories = [];
 
-      if (matchedCategories.length > 0) {
-        query.category = { $in: matchedCategories };
-      } else {
-        query.category = { $regex: new RegExp(`^${category.trim()}$`, 'i') };
-      }
+      rawCategories.forEach((catItem) => {
+        const matchedDbCat = dbCategories.find(
+          (c) =>
+            c.name.toLowerCase() === catItem.toLowerCase() ||
+            (c.slug && c.slug.toLowerCase() === catItem.toLowerCase())
+        );
+
+        if (matchedDbCat) {
+          searchCategories.push(matchedDbCat.name);
+          const subCats = dbCategories.filter((c) => c.parent === matchedDbCat.name);
+          subCats.forEach((sub) => searchCategories.push(sub.name));
+        } else {
+          searchCategories.push(catItem);
+        }
+      });
+
+      const uniqueCategoryNames = [...new Set(searchCategories)];
+      query.category = {
+        $in: uniqueCategoryNames.map((name) => new RegExp(`^${escapeRegex(name)}$`, 'i')),
+      };
     }
 
     // 2b. Boolean Flag Filters
@@ -63,20 +96,26 @@ const getProducts = async (req, res) => {
       query.newArrival = true;
     }
 
-    // 3. Brand Filter
-    if (brand && brand !== 'all' && brand.trim() !== '') {
-      query.brand = { $regex: new RegExp(`^${brand.trim()}$`, 'i') };
+    // 3. Multi-Select Brand Filter ($in)
+    const rawBrands = parseMultiParam(brands || brand);
+    if (rawBrands.length > 0) {
+      const uniqueBrands = [...new Set(rawBrands)];
+      query.brand = {
+        $in: uniqueBrands.map((bName) => new RegExp(`^${escapeRegex(bName)}$`, 'i')),
+      };
     }
 
-    // 4. Price Filter
-    if (minPrice || maxPrice) {
+    // 4. Price Range Filter ($gte and $lte)
+    const minP = minPrice !== undefined && minPrice !== '' ? Number(minPrice) : undefined;
+    const maxP = maxPrice !== undefined && maxPrice !== '' ? Number(maxPrice) : undefined;
+    if ((minP !== undefined && !isNaN(minP)) || (maxP !== undefined && !isNaN(maxP))) {
       query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+      if (minP !== undefined && !isNaN(minP)) query.price.$gte = minP;
+      if (maxP !== undefined && !isNaN(maxP)) query.price.$lte = maxP;
     }
 
-    // 5. Rating Filter
-    if (rating && Number(rating) > 0) {
+    // 5. Rating Filter ($gte)
+    if (rating !== undefined && rating !== '' && !isNaN(Number(rating)) && Number(rating) > 0) {
       query.rating = { $gte: Number(rating) };
     }
 
@@ -87,6 +126,11 @@ const getProducts = async (req, res) => {
       } else if (stock === 'outOfStock') {
         query.stock = 0;
       }
+    }
+
+    // 6b. Discount Filter
+    if (discount === 'true' || discount === true) {
+      query.discountPercentage = { $gt: 0 };
     }
 
     // 7. Sort Options
@@ -265,10 +309,50 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getTrendingProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ trending: true });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getNewArrivalsProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ newArrival: true });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getBestSellersProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ bestSeller: true });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getFeaturedProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ featured: true });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  getTrendingProducts,
+  getNewArrivalsProducts,
+  getBestSellersProducts,
+  getFeaturedProducts,
 };

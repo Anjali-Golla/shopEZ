@@ -165,6 +165,11 @@ const ProductDetails = () => {
 
   const handleBuyNowClick = () => {
     if (!product) return;
+    if (!user) {
+      toast.warning('Please login first to proceed with your order.');
+      navigate('/login', { state: { from: '/checkout', buyNowItem: { product, quantity } } });
+      return;
+    }
     navigate('/checkout', { state: { buyNowItem: { product, quantity } } });
   };
 
@@ -323,7 +328,12 @@ const ProductDetails = () => {
         {/* Left Section: Gallery */}
         <div className="gallery-section">
           <div className="main-image-container">
-            <img src={activeImage} alt={name} className="main-image" />
+            <img 
+              src={activeImage || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&auto=format&fit=crop&q=60'} 
+              alt={name} 
+              className="main-image" 
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&auto=format&fit=crop&q=60'; }}
+            />
             {discountPercentage && (
               <span className="details-discount-badge">-{discountPercentage}%</span>
             )}
@@ -335,7 +345,11 @@ const ProductDetails = () => {
                 className={`thumbnail-btn ${activeImage === imgUrl ? 'active' : ''}`}
                 onClick={() => setActiveImage(imgUrl)}
               >
-                <img src={imgUrl} alt={`Thumbnail ${index + 1}`} />
+                <img 
+                  src={imgUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                  alt={`Thumbnail ${index + 1}`} 
+                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                />
               </button>
             ))}
           </div>
@@ -449,7 +463,11 @@ const ProductDetails = () => {
           <div className="bundle-container">
             <div className="bundle-items-flex">
               <div className="bundle-item-card">
-                <img src={product.image} alt={name} />
+                <img 
+                  src={product.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                  alt={name} 
+                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                />
                 <h5>{name}</h5>
                 <Price price={price} discountPrice={discountPrice} size="sm" />
               </div>
@@ -457,7 +475,11 @@ const ProductDetails = () => {
               <FaPlus className="bundle-plus-icon" />
 
               <div className="bundle-item-card">
-                <img src={bundleProduct.image} alt={bundleProduct.name} />
+                <img 
+                  src={bundleProduct.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                  alt={bundleProduct.name} 
+                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                />
                 <h5>{bundleProduct.name}</h5>
                 <Price price={bundleProduct.price} discountPrice={bundleProduct.discountPrice} size="sm" />
               </div>

@@ -61,7 +61,12 @@ const ProductCard = ({ product }) => {
       <Link to={`/product/${_id}`} className="product-card-link">
         {/* Product Image & Badges */}
         <div className="product-image-container">
-          <img src={image} alt={name} loading="lazy" />
+          <img 
+            src={image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=60'} 
+            alt={name} 
+            loading="lazy" 
+            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=60'; }}
+          />
           
           {discountPercentage && (
             <span className="discount-badge">-{discountPercentage}%</span>

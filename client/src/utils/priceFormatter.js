@@ -7,7 +7,7 @@
  */
 export const formatPrice = (price) => {
   if (price === undefined || price === null || isNaN(price)) {
-    return '₹0';
+    return '0\u00A0₹';
   }
   
   const formatter = new Intl.NumberFormat('en-IN', {
@@ -15,5 +15,5 @@ export const formatPrice = (price) => {
     minimumFractionDigits: 0,
   });
   
-  return `₹ ${formatter.format(price)}`;
+  return `${formatter.format(price)}\u00A0₹`;
 };

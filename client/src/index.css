@@ -113,3 +113,18 @@ button {
   flex: 1 0 auto;
   padding: 32px 0;
 }
+
+/* Typography Sizing legibility polish */
+html {
+  font-size: 16.5px;
+}
+body {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+}
+.navbar-brand, .nav-links a, .sidebar-menu-item, .product-name, .btn, .form-group label, .admin-table th, .admin-table td {
+  font-weight: 500;
+}

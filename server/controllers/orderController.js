@@ -91,6 +91,9 @@ const createOrder = async (req, res) => {
       });
     }
 
+    const estDeliveryDate = new Date();
+    estDeliveryDate.setDate(estDeliveryDate.getDate() + 7);
+
     const order = new Order({
       user: req.user._id,
       orderItems,
@@ -103,6 +106,7 @@ const createOrder = async (req, res) => {
       paymentTime,
       couponCode: orderCouponCode,
       couponDiscount: orderCouponDiscount,
+      deliveryDate: estDeliveryDate,
     });
 
     const createdOrder = await order.save();
@@ -177,7 +181,7 @@ const updateOrderStatus = async (req, res) => {
 
     if (order) {
       const { status } = req.body;
-      if (!['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].includes(status)) {
+      if (!['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].includes(status)) {
         res.status(400).json({ message: 'Invalid status' });
         return;
       }

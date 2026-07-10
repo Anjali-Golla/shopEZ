@@ -80,12 +80,25 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.pre('save', function (next) {
+productSchema.pre('save', function () {
+  // Sync flags to tag
+  if (this.featured) {
+    this.tag = 'featured';
+  } else if (this.trending) {
+    this.tag = 'trending';
+  } else if (this.bestSeller) {
+    this.tag = 'best-seller';
+  } else if (this.newArrival) {
+    this.tag = 'new-arrival';
+  } else if (['featured', 'trending', 'best-seller', 'new-arrival'].includes(this.tag)) {
+    this.tag = '';
+  }
+
+  // Sync tag to flags
   if (this.tag === 'featured') this.featured = true;
   if (this.tag === 'trending') this.trending = true;
   if (this.tag === 'best-seller') this.bestSeller = true;
   if (this.tag === 'new-arrival') this.newArrival = true;
-  next();
 });
 
 module.exports = mongoose.model('Product', productSchema);

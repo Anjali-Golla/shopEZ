@@ -5,7 +5,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   padding: 20px;
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .admin-login-card {

@@ -74,8 +74,12 @@ const MyOrders = () => {
       case 'delivered':
         return 'badge-success';
       case 'shipped':
+      case 'out for delivery':
         return 'badge-blue';
       case 'pending':
+      case 'confirmed':
+      case 'processing':
+      case 'packed':
         return 'badge-warning';
       case 'cancelled':
       default:
@@ -251,13 +255,48 @@ const MyOrders = () => {
               </button>
             </div>
             <div className="modal-body">
+              {trackingOrder.orderStatus === 'Cancelled' && (
+                <div className="auth-alert error" style={{ marginBottom: '15px' }}>
+                  This order has been Cancelled.
+                </div>
+              )}
               <div className="tracking-timeline">
                 {[
-                  { title: 'Order Placed', desc: 'Order transaction accepted and processed', check: true },
-                  { title: 'Processing', desc: 'Package packed and checked at hub', check: true },
-                  { title: 'Shipped', desc: 'Package departed carrier facility', check: ['shipped', 'delivered'].includes((trackingOrder.orderStatus || '').toLowerCase()) },
-                  { title: 'Out For Delivery', desc: 'Package out with delivery agent', check: (trackingOrder.orderStatus || '').toLowerCase() === 'delivered' },
-                  { title: 'Delivered', desc: 'Package arrived at delivery location', check: (trackingOrder.orderStatus || '').toLowerCase() === 'delivered' }
+                  { 
+                    title: 'Order Placed', 
+                    desc: 'Order transaction accepted and processed', 
+                    check: trackingOrder.orderStatus !== 'Cancelled' 
+                  },
+                  { 
+                    title: 'Confirmed', 
+                    desc: 'Order confirmed and verified', 
+                    check: ['confirmed', 'processing', 'packed', 'shipped', 'out for delivery', 'delivered'].includes((trackingOrder.orderStatus || '').toLowerCase())
+                  },
+                  { 
+                    title: 'Processing', 
+                    desc: 'Package packed and checked at hub', 
+                    check: ['processing', 'packed', 'shipped', 'out for delivery', 'delivered'].includes((trackingOrder.orderStatus || '').toLowerCase())
+                  },
+                  { 
+                    title: 'Packed', 
+                    desc: 'Package is packed and ready to ship', 
+                    check: ['packed', 'shipped', 'out for delivery', 'delivered'].includes((trackingOrder.orderStatus || '').toLowerCase())
+                  },
+                  { 
+                    title: 'Shipped', 
+                    desc: 'Package departed carrier facility', 
+                    check: ['shipped', 'out for delivery', 'delivered'].includes((trackingOrder.orderStatus || '').toLowerCase()) 
+                  },
+                  { 
+                    title: 'Out For Delivery', 
+                    desc: 'Package out with delivery agent', 
+                    check: ['out for delivery', 'delivered'].includes((trackingOrder.orderStatus || '').toLowerCase()) 
+                  },
+                  { 
+                    title: 'Delivered', 
+                    desc: 'Package arrived at delivery location', 
+                    check: (trackingOrder.orderStatus || '').toLowerCase() === 'delivered' 
+                  }
                 ].map((step, idx) => (
                   <div key={idx} className={`timeline-step ${step.check ? 'completed' : ''}`}>
                     <div className="timeline-node">
