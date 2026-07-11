@@ -31,12 +31,14 @@ import { formatPrice } from '../utils/priceFormatter';
 import Price from '../components/Price';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { useSocket } from '../context/SocketContext';
 import { AdminSkeleton } from '../components/Skeletons';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { user, updateLocalUser } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
+  const { socket } = useSocket();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -178,11 +180,25 @@ const AdminDashboard = () => {
     if (user && user.role === 'admin') {
       fetchAdminData(false); // Initial Foreground Load
       
-      // 15-second Real-time Polling
-      const intervalId = setInterval(() => fetchAdminData(true), 15000);
-      return () => clearInterval(intervalId);
+      // Socket.IO Real-time Synchronization
+      if (socket) {
+        socket.on('dashboard-update', () => {
+          console.log('[Socket.IO] Dashboard update received! Refetching data instantly...');
+          fetchAdminData(true);
+        });
+      }
+      
+      // 30-second Fallback Polling (if socket disconnects or isn't firing)
+      const intervalId = setInterval(() => fetchAdminData(true), 30000);
+      
+      return () => {
+        clearInterval(intervalId);
+        if (socket) {
+          socket.off('dashboard-update');
+        }
+      };
     }
-  }, [user]);
+  }, [user, socket]);
 
   // Compute category product counts dynamically from full products list
   const categoriesWithCounts = useMemo(() => {

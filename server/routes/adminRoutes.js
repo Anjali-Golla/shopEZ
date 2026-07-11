@@ -8,6 +8,9 @@ const {
   getDashboardStats,
   getAnalyticsStats,
   getAdminNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -35,5 +38,14 @@ router.route('/analytics')
 
 router.route('/notifications')
   .get(getAdminNotifications);
+
+router.route('/notifications/read-all')
+  .put(markAllNotificationsRead);
+
+router.route('/notifications/:id/read')
+  .put(markNotificationRead);
+
+router.route('/notifications/:id')
+  .delete(deleteNotification);
 
 module.exports = router;

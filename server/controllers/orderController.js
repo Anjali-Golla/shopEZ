@@ -110,6 +110,18 @@ const createOrder = async (req, res) => {
     });
 
     const createdOrder = await order.save();
+    
+    // Notify admin dashboard
+    const { createAdminNotification } = require('./adminController');
+    await createAdminNotification(
+      req,
+      'New Order Placed',
+      `A new order of ₹${createdOrder.totalPrice} has been placed.`,
+      'success',
+      '/admin/orders',
+      createdOrder._id
+    );
+
     res.status(201).json(createdOrder);
   } catch (error) {
     res.status(500).json({ message: error.message });

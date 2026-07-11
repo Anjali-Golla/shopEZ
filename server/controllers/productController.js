@@ -235,6 +235,18 @@ const createProduct = async (req, res) => {
     });
 
     const createdProduct = await product.save();
+    
+    // Notify admin dashboard
+    const { createAdminNotification } = require('./adminController');
+    await createAdminNotification(
+      req,
+      'Product Created',
+      `New product "${createdProduct.name}" added to inventory.`,
+      'success',
+      '/admin/products',
+      createdProduct._id
+    );
+
     res.status(201).json(createdProduct);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -282,6 +294,25 @@ const updateProduct = async (req, res) => {
       product.newArrival = newArrival !== undefined ? newArrival : product.newArrival;
 
       const updatedProduct = await product.save();
+      
+      // Notify admin dashboard
+      const { createAdminNotification } = require('./adminController');
+      
+      // If stock dropped to zero
+      if (stock === 0 || stock === '0') {
+        await createAdminNotification(
+          req,
+          'Out of Stock',
+          `"${updatedProduct.name}" is now out of stock.`,
+          'danger',
+          '/admin/inventory',
+          updatedProduct._id
+        );
+      } else if (req.app.get('io')) {
+        // Just emit dashboard update without a persistent notification for a simple edit
+        req.app.get('io').emit('dashboard-update');
+      }
+
       res.json(updatedProduct);
     } else {
       res.status(404).json({ message: 'Product not found' });

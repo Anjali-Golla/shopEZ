@@ -17,11 +17,13 @@ import {
 } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { useSocket } from '../context/SocketContext';
 import './AdminNavbar.css';
 
 const AdminNavbar = ({ toggleSidebar }) => {
   const { user } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { socket } = useSocket();
   
   const [currentTime, setCurrentTime] = useState(new Date());
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -34,25 +36,46 @@ const AdminNavbar = ({ toggleSidebar }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Poll notifications from live MongoDB data every 10 seconds
-  useEffect(() => {
+  // Fetch initial notifications
+  const fetchNotifications = async () => {
     if (!user || user.role !== 'admin') return;
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const res = await axios.get('/api/admin/notifications', config);
+      setNotifications(res.data || []);
+    } catch (err) {
+      console.error('Failed to load navbar notifications', err);
+    }
+  };
 
-    const fetchNotifications = async () => {
-      try {
-        const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        const res = await axios.get('/api/admin/notifications', config);
-        setNotifications(res.data || []);
-      } catch (err) {
-        console.error('Failed to load navbar notifications', err);
+  useEffect(() => {
+    fetchNotifications();
+    
+    // Socket.IO Real-time synchronization
+    if (socket) {
+      socket.on('new-admin-notification', (newNotif) => {
+        // Prepend new notification to state
+        setNotifications((prev) => [newNotif, ...prev]);
+        // Open the drawer automatically for high-priority alerts
+        if (newNotif.type === 'danger' || newNotif.type === 'success') {
+          setNotificationsOpen(true);
+        }
+      });
+      
+      socket.on('admin-notifications-read-all', () => fetchNotifications());
+      socket.on('admin-notification-read', () => fetchNotifications());
+      socket.on('admin-notification-deleted', () => fetchNotifications());
+    }
+    
+    return () => {
+      if (socket) {
+        socket.off('new-admin-notification');
+        socket.off('admin-notifications-read-all');
+        socket.off('admin-notification-read');
+        socket.off('admin-notification-deleted');
       }
     };
-
-    fetchNotifications();
-    const pollInterval = setInterval(fetchNotifications, 10000);
-
-    return () => clearInterval(pollInterval);
-  }, [user]);
+  }, [user, socket]);
 
   // Resolve corresponding icon based on notification parameters
   const getNotificationIcon = (type, title) => {
@@ -64,12 +87,34 @@ const AdminNavbar = ({ toggleSidebar }) => {
     return FaShoppingBag;
   };
 
-  const handleClearAll = () => {
-    setNotifications([]);
+  const handleClearAll = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.put('/api/admin/notifications/read-all', {}, config);
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleRemoveNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+  const handleRemoveNotification = async (id) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.delete(`/api/admin/notifications/${id}`, config);
+      setNotifications(prev => prev.filter(n => n._id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  const handleMarkAsRead = async (id) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.put(`/api/admin/notifications/${id}/read`, {}, config);
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -115,15 +160,17 @@ const AdminNavbar = ({ toggleSidebar }) => {
         <div className="notification-bell-container">
           <button className="navbar-icon-action-btn bell-btn" onClick={() => setNotificationsOpen(!notificationsOpen)} title="Notifications">
             <FaBell />
-            {notifications.length > 0 && <span className="bell-badge">{notifications.length}</span>}
+            {notifications.filter(n => !n.isRead).length > 0 && (
+              <span className="bell-badge">{notifications.filter(n => !n.isRead).length}</span>
+            )}
           </button>
 
           {notificationsOpen && (
             <div className="notification-dropdown">
               <div className="dropdown-header">
-                <h4>Notifications ({notifications.length})</h4>
-                {notifications.length > 0 && (
-                  <button onClick={handleClearAll} className="clear-all-alerts-btn">Clear All</button>
+                <h4>Notifications ({notifications.filter(n => !n.isRead).length})</h4>
+                {notifications.some(n => !n.isRead) && (
+                  <button onClick={handleClearAll} className="clear-all-alerts-btn">Mark All Read</button>
                 )}
               </div>
               <div className="dropdown-body scrollbar-styled">
@@ -131,13 +178,13 @@ const AdminNavbar = ({ toggleSidebar }) => {
                   notifications.map((n) => {
                     const Icon = getNotificationIcon(n.type, n.title);
                     return (
-                      <div key={n.id} className={`dropdown-alert-row ${n.type}`}>
+                      <div key={n._id} className={`dropdown-alert-row ${n.type} ${!n.isRead ? 'unread' : 'read'}`} style={{ opacity: n.isRead ? 0.6 : 1 }}>
                         <Icon className="alert-row-icon" />
-                        <div className="alert-row-text">
+                        <div className="alert-row-text" onClick={() => !n.isRead && handleMarkAsRead(n._id)} style={{ cursor: 'pointer' }}>
                           <h5>{n.title}</h5>
-                          <p>{n.text}</p>
+                          <p>{n.message || n.text}</p>
                         </div>
-                        <button className="remove-alert-btn" onClick={() => handleRemoveNotification(n.id)}>
+                        <button className="remove-alert-btn" onClick={() => handleRemoveNotification(n._id)}>
                           <FaTimes />
                         </button>
                       </div>

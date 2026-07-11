@@ -37,6 +37,17 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Notify admin dashboard
+      const { createAdminNotification } = require('./adminController');
+      await createAdminNotification(
+        req,
+        'New Customer Signup',
+        `Customer "${user.name}" has registered on the store.`,
+        'success',
+        '/admin/users',
+        user._id
+      );
+
       res.status(201).json({
         _id: user._id,
         name: user.name,

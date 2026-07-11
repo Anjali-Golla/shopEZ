@@ -269,89 +269,100 @@ const getAnalyticsStats = async (req, res) => {
   }
 };
 
-// @desc    Get aggregated admin notifications
+// @desc    Get all admin notifications
 // @route   GET /api/admin/notifications
 // @access  Private/Admin
 const getAdminNotifications = async (req, res) => {
   try {
-    // 1. Low stock alerts (< 5 units)
-    const lowStock = await Product.find({ stock: { $lt: 5 } });
-
-    // 2. Pending orders
-    const pendingOrders = await Order.find({ orderStatus: 'Pending' });
-
-    // 3. Cancelled orders (limit 10)
-    const cancelledOrders = await Order.find({ orderStatus: 'Cancelled' }).sort({ updatedAt: -1 }).limit(10);
-
-    // 4. New orders in last 24h
-    const newOrders = await Order.find({
-      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
-    }).sort({ createdAt: -1 });
-
-    // 5. New customers signed up in last 24h
-    const newCustomers = await User.find({
-      role: 'customer',
-      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
-    }).sort({ createdAt: -1 });
-
-    const notifications = [];
-
-    lowStock.forEach(p => {
-      notifications.push({
-        id: `stock-low-${p._id}`,
-        type: 'warning',
-        title: p.stock === 0 ? 'Out of Stock' : 'Low Stock Warning',
-        text: `"${p.name}" has only ${p.stock} units left in stock.`,
-        time: p.updatedAt || p.createdAt,
-      });
-    });
-
-    pendingOrders.forEach(o => {
-      notifications.push({
-        id: `order-pending-${o._id}`,
-        type: 'info',
-        title: 'Pending Order',
-        text: `Order ID ${o._id.toString().slice(-6)} is pending validation.`,
-        time: o.createdAt,
-      });
-    });
-
-    cancelledOrders.forEach(o => {
-      notifications.push({
-        id: `order-cancelled-${o._id}`,
-        type: 'danger',
-        title: 'Order Cancelled',
-        text: `Order ID ${o._id.toString().slice(-6)} has been cancelled.`,
-        time: o.updatedAt || o.createdAt,
-      });
-    });
-
-    newOrders.forEach(o => {
-      notifications.push({
-        id: `order-new-${o._id}`,
-        type: 'success',
-        title: 'New Order Placed',
-        text: `A new order of ₹${o.totalPrice} has been placed.`,
-        time: o.createdAt,
-      });
-    });
-
-    newCustomers.forEach(u => {
-      notifications.push({
-        id: `customer-new-${u._id}`,
-        type: 'success',
-        title: 'New Customer Signup',
-        text: `Customer "${u.name}" has registered on the store.`,
-        time: u.createdAt,
-      });
-    });
-
-    // Sort notifications chronologically descending (newest first)
-    notifications.sort((a, b) => new Date(b.time) - new Date(a.time));
-
+    const Notification = require('../models/Notification');
+    const notifications = await Notification.find({}).sort({ createdAt: -1 }).limit(50);
     res.json(notifications);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Mark a notification as read
+// @route   PUT /api/admin/notifications/:id/read
+// @access  Private/Admin
+const markNotificationRead = async (req, res) => {
+  try {
+    const Notification = require('../models/Notification');
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+    notification.isRead = true;
+    await notification.save();
+    
+    // Broadcast update
+    if (req.app.get('io')) {
+      req.app.get('io').emit('admin-notification-read', req.params.id);
+    }
+    
+    res.json(notification);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Mark all notifications as read
+// @route   PUT /api/admin/notifications/read-all
+// @access  Private/Admin
+const markAllNotificationsRead = async (req, res) => {
+  try {
+    const Notification = require('../models/Notification');
+    await Notification.updateMany({ isRead: false }, { isRead: true });
+    
+    // Broadcast update
+    if (req.app.get('io')) {
+      req.app.get('io').emit('admin-notifications-read-all');
+    }
+    
+    res.json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete a notification
+// @route   DELETE /api/admin/notifications/:id
+// @access  Private/Admin
+const deleteNotification = async (req, res) => {
+  try {
+    const Notification = require('../models/Notification');
+    await Notification.findByIdAndDelete(req.params.id);
+    
+    // Broadcast update
+    if (req.app.get('io')) {
+      req.app.get('io').emit('admin-notification-deleted', req.params.id);
+    }
+    
+    res.json({ message: 'Notification removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Helper function to create notification and emit socket event
+const createAdminNotification = async (req, title, message, type = 'info', link = null, relatedId = null) => {
+  try {
+    const Notification = require('../models/Notification');
+    const notification = await Notification.create({
+      title,
+      message,
+      type,
+      link,
+      relatedId
+    });
+    
+    if (req && req.app.get('io')) {
+      req.app.get('io').emit('new-admin-notification', notification);
+      req.app.get('io').emit('dashboard-update'); // Tell dashboard to refresh data
+    }
+    return notification;
+  } catch (error) {
+    console.error('Error creating notification:', error.message);
   }
 };
 
@@ -363,4 +374,8 @@ module.exports = {
   getDashboardStats,
   getAnalyticsStats,
   getAdminNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification,
+  createAdminNotification
 };
