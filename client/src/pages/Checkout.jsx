@@ -481,9 +481,9 @@ const Checkout = () => {
                   return (
                     <div key={item.product._id} className="summary-item-row">
                       <img 
-                        src={item.product.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
+                        src={item.product.image || '/placeholder.png'} 
                         alt={item.product.name} 
-                        onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
+                        onError={(e) => { e.target.src = '/placeholder.png'; }}
                       />
                       <div className="summary-item-info">
                         <h4>{item.product.name}</h4>

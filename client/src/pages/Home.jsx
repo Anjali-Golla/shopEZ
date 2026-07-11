@@ -131,7 +131,7 @@ const Home = () => {
         </div>
         <div className="hero-image-container">
           <img 
-            src="https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg" 
+            src="/hero_banner.png" 
             alt="Premium Shopping" 
             className="hero-image"
           />

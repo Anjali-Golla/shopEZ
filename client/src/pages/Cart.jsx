@@ -148,9 +148,9 @@ const Cart = () => {
                 {/* Image */}
                 <div className="cart-item-img-container">
                    <img 
-                    src={image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
+                    src={image || '/placeholder.png'} 
                     alt={name} 
-                    onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
+                    onError={(e) => { e.target.src = '/placeholder.png'; }}
                   />
                 </div>
 

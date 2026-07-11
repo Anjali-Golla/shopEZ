@@ -122,7 +122,7 @@ const AdminDashboard = () => {
   // Settings state
   const [storeSettings, setStoreSettings] = useState({
     storeName: 'ShopEZ Premium E-Commerce',
-    websiteLogo: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    websiteLogo: '/placeholder.png',
     contactEmail: 'admin@shopez.com',
     supportNumber: '+91 98765 43210',
     taxRate: 18,
@@ -1119,11 +1119,11 @@ const AdminDashboard = () => {
                     </td>
                     <td>
                       <img 
-                        src={p.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
+                        src={p.image || '/placeholder.png'} 
                         alt={p.name} 
                         className="table-thumb-premium" 
                         onClick={() => setViewProductDetails(p)} 
-                        onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
+                        onError={(e) => { e.target.src = '/placeholder.png'; }}
                       />
                     </td>
                     <td>
@@ -1460,10 +1460,10 @@ const AdminDashboard = () => {
                       <td>
                         <div className="product-table-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           <img 
-                            src={p.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
+                            src={p.image || '/placeholder.png'} 
                             alt={p.name} 
                             style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)', flexShrink: 0 }} 
-                            onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
+                            onError={(e) => { e.target.src = '/placeholder.png'; }}
                           />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             <strong className="inventory-product-name" title={p.name}>
