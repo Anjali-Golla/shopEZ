@@ -145,7 +145,7 @@
   }
   
   /* When sidebarCollapsed is FALSE, it means the menu is OPEN on mobile! */
-  .admin-dashboard-container:not(.collapsed) .admin-sidebar {
+  .admin-layout-container:not(.collapsed) .admin-sidebar {
     left: 0;
   }
   
