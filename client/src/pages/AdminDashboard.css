@@ -616,6 +616,13 @@
   border-bottom: 1px solid var(--border-color);
   font-size: 0.85rem;
   color: var(--text-color);
+  white-space: nowrap; /* Prevent squishing text into vertical stacks */
+}
+
+/* Allow product name to wrap if it's very long, but keep a minimum width */
+.admin-table td:nth-child(3) {
+  white-space: normal;
+  min-width: 200px;
 }
 
 .admin-table th {
