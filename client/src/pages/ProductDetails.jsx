@@ -93,8 +93,8 @@ const ProductDetails = () => {
     if (!product) return [];
     return [
       product.image,
-      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&auto=format&fit=crop&q=60",
-      "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&auto=format&fit=crop&q=60",
+      "https://placehold.co/600x400/eeeeee/999999?text=Product+Image",
+      "https://placehold.co/600x400/eeeeee/999999?text=Product+Image",
     ];
   }, [product]);
 
@@ -329,10 +329,10 @@ const ProductDetails = () => {
         <div className="gallery-section">
           <div className="main-image-container">
             <img 
-              src={activeImage || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&auto=format&fit=crop&q=60'} 
+              src={activeImage || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
               alt={name} 
               className="main-image" 
-              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&auto=format&fit=crop&q=60'; }}
+              onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
             />
             {discountPercentage && (
               <span className="details-discount-badge">-{discountPercentage}%</span>
@@ -346,9 +346,9 @@ const ProductDetails = () => {
                 onClick={() => setActiveImage(imgUrl)}
               >
                 <img 
-                  src={imgUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                  src={imgUrl || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
                   alt={`Thumbnail ${index + 1}`} 
-                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                  onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
                 />
               </button>
             ))}
@@ -464,9 +464,9 @@ const ProductDetails = () => {
             <div className="bundle-items-flex">
               <div className="bundle-item-card">
                 <img 
-                  src={product.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                  src={product.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
                   alt={name} 
-                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                  onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
                 />
                 <h5>{name}</h5>
                 <Price price={price} discountPrice={discountPrice} size="sm" />
@@ -476,9 +476,9 @@ const ProductDetails = () => {
 
               <div className="bundle-item-card">
                 <img 
-                  src={bundleProduct.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                  src={bundleProduct.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
                   alt={bundleProduct.name} 
-                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                  onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
                 />
                 <h5>{bundleProduct.name}</h5>
                 <Price price={bundleProduct.price} discountPrice={bundleProduct.discountPrice} size="sm" />

@@ -49,7 +49,8 @@ const ProductCard = ({ product }) => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     try {
-      await addToCart(_id, 1);
+      const res = await addToCart(_id, 1);
+      if (!res) return; // Action aborted (e.g., not logged in)
       toast.success(`${name} added to cart!`);
     } catch (err) {
       toast.error(err || 'Failed to add item');
@@ -62,10 +63,10 @@ const ProductCard = ({ product }) => {
         {/* Product Image & Badges */}
         <div className="product-image-container">
           <img 
-            src={image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=60'} 
+            src={image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
             alt={name} 
             loading="lazy" 
-            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=60'; }}
+            onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
           />
           
           {discountPercentage && (

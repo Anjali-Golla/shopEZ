@@ -148,9 +148,9 @@ const Cart = () => {
                 {/* Image */}
                 <div className="cart-item-img-container">
                    <img 
-                    src={image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                    src={image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
                     alt={name} 
-                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                    onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
                   />
                 </div>
 

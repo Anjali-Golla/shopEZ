@@ -120,7 +120,7 @@ const AdminDashboard = () => {
   // Settings state
   const [storeSettings, setStoreSettings] = useState({
     storeName: 'ShopEZ Premium E-Commerce',
-    websiteLogo: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100',
+    websiteLogo: 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
     contactEmail: 'admin@shopez.com',
     supportNumber: '+91 98765 43210',
     taxRate: 18,
@@ -1099,11 +1099,11 @@ const AdminDashboard = () => {
                     </td>
                     <td>
                       <img 
-                        src={p.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                        src={p.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
                         alt={p.name} 
                         className="table-thumb-premium" 
                         onClick={() => setViewProductDetails(p)} 
-                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                        onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
                       />
                     </td>
                     <td>
@@ -1440,10 +1440,10 @@ const AdminDashboard = () => {
                       <td>
                         <div className="product-table-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           <img 
-                            src={p.image || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'} 
+                            src={p.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
                             alt={p.name} 
                             style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)', flexShrink: 0 }} 
-                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100&auto=format&fit=crop&q=60'; }}
+                            onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
                           />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             <strong className="inventory-product-name" title={p.name}>

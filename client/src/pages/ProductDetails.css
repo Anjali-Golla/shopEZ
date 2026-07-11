@@ -810,13 +810,18 @@
   }
   
   .related-products-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .reviews-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
 }
 
 @media (max-width: 768px) {
   .details-title {
-    font-size: 1.6rem;
+    font-size: clamp(1.4rem, 1.2rem + 1vw, 1.8rem);
   }
   
   .spec-label {
@@ -839,15 +844,18 @@
 
 @media (max-width: 576px) {
   .main-image-container {
-    height: 300px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    padding: 16px;
   }
   
   .thumbnails-row {
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .related-products-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   }
   
   .details-actions-row {

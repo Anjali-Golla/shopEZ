@@ -618,7 +618,7 @@ body.dark-theme .qr-code-graphic-wrapper {
 
 @media (max-width: 768px) {
   .checkout-step-indicator-bar {
-    padding: 16px;
+    padding: clamp(12px, 3vw, 16px);
   }
   
   .step-item span {
@@ -643,11 +643,15 @@ body.dark-theme .qr-code-graphic-wrapper {
   }
   
   .checkout-step-view-card {
-    padding: 20px;
+    padding: clamp(16px, 4vw, 20px);
   }
   
   .wallets-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .step-container h2 {
+    font-size: clamp(1.2rem, 1.1rem + 1vw, 1.35rem);
   }
 }
 

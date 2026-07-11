@@ -131,7 +131,7 @@ const Home = () => {
         </div>
         <div className="hero-image-container">
           <img 
-            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&auto=format&fit=crop&q=60" 
+            src="https://placehold.co/600x400/eeeeee/999999?text=Product+Image" 
             alt="Premium Shopping" 
             className="hero-image"
           />

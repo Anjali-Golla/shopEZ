@@ -575,13 +575,16 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: 24px;
+  padding: clamp(16px, 4vw, 24px);
+  overflow-x: auto;
+  width: 100%;
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 600px; /* Force scroll on small screens */
 }
 
 .admin-table th,

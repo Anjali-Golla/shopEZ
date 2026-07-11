@@ -178,10 +178,11 @@
   color: var(--text-light);
 }
 
-.categories-grid {
+.categories-grid, .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(16px, 3vw, 24px);
+  min-width: 0; /* Prevent flex/grid blowout */
 }
 
 #categories-section {
@@ -190,18 +191,18 @@
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: clamp(16px, 3vw, 24px);
   grid-auto-rows: 1fr;
 }
 
 /* 4. Offer Banner Section */
 .offer-banner-section {
-  background: linear-gradient(rgba(26, 115, 232, 0.9), rgba(21, 87, 176, 0.9)), url('https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&auto=format&fit=crop&q=60');
+  background: linear-gradient(rgba(26, 115, 232, 0.9), rgba(21, 87, 176, 0.9)), url('https://placehold.co/1200x800/1a73e8/1557b0');
   background-size: cover;
   background-position: center;
   border-radius: var(--radius-lg);
-  padding: 60px 48px;
+  padding: clamp(32px, 5vw, 60px) clamp(24px, 4vw, 48px);
   color: #ffffff;
   text-align: center;
   box-shadow: var(--shadow-md);
@@ -228,7 +229,7 @@
 }
 
 .offer-banner-content h2 {
-  font-size: 2.2rem;
+  font-size: clamp(1.6rem, 1.4rem + 2vw, 2.2rem);
   font-weight: 800;
   color: #ffffff;
   margin: 0;
@@ -245,8 +246,8 @@
 /* 5. Reviews Section Styling */
 .reviews-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(16px, 3vw, 24px);
 }
 
 .review-card {
@@ -298,7 +299,7 @@
 .newsletter-section {
   background-color: var(--primary-light);
   border-radius: var(--radius-lg);
-  padding: 48px;
+  padding: clamp(32px, 5vw, 48px);
   text-align: center;
 }
 
@@ -312,7 +313,7 @@
 }
 
 .newsletter-content h2 {
-  font-size: 1.8rem;
+  font-size: clamp(1.4rem, 1.2rem + 1.5vw, 1.8rem);
   font-weight: 700;
   color: var(--primary-dark);
   margin: 0;
@@ -364,43 +365,26 @@
 }
 
 /* RESPONSIVE SCALING */
-@media (max-width: 1200px) {
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 @media (max-width: 992px) {
   .hero-section {
     grid-template-columns: 1fr;
     gap: 32px;
-    padding: 36px;
+    padding: clamp(24px, 4vw, 36px);
   }
   
   .hero-image-container {
-    height: 300px;
+    height: auto;
+    aspect-ratio: 4 / 3;
     order: -1; /* Display image on top in tablet/mobile */
   }
   
   .value-props-bar {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-  }
-
-  .reviews-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .reviews-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .newsletter-form {
     flex-direction: column;
     gap: 12px;
@@ -412,23 +396,11 @@
 }
 
 @media (max-width: 576px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .hero-description {
-    font-size: 0.95rem;
-  }
-  
   .value-props-bar {
     grid-template-columns: 1fr;
   }
   
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .offer-banner-content h2 {
-    font-size: 1.6rem;
+  .hero-image-container {
+    aspect-ratio: 1 / 1;
   }
 }
