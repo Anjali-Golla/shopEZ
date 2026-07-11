@@ -12,7 +12,8 @@ import {
   FaExclamationTriangle,
   FaShoppingBag,
   FaUserPlus,
-  FaTimesCircle
+  FaTimesCircle,
+  FaBars
 } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
@@ -73,13 +74,23 @@ const AdminNavbar = ({ toggleSidebar }) => {
 
   return (
     <header className="admin-navbar">
-      <div className="topbar-welcome">
-        <h1>Welcome back, Administrator</h1>
-        <div className="datetime-badge">
-          <FaCalendarAlt />
-          <span>{currentTime.toLocaleDateString()}</span>
-          <FaClock />
-          <span>{currentTime.toLocaleTimeString()}</span>
+      <div className="topbar-welcome" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button 
+          className="navbar-icon-action-btn mobile-hamburger-toggle" 
+          onClick={toggleSidebar} 
+          aria-label="Toggle Sidebar"
+          style={{ display: 'none' }} // Hidden on desktop via CSS, shown on mobile
+        >
+          <FaBars />
+        </button>
+        <div>
+          <h1>Welcome back, Administrator</h1>
+          <div className="datetime-badge">
+            <FaCalendarAlt />
+            <span>{currentTime.toLocaleDateString()}</span>
+            <FaClock />
+            <span>{currentTime.toLocaleTimeString()}</span>
+          </div>
         </div>
       </div>
 

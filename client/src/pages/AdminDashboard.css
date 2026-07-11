@@ -1594,6 +1594,44 @@ body.dark-theme .tab-view-wrap .stat-card {
    MOBILE & TABLET RESPONSIVENESS
    ========================================================================== */
 
+.dashboard-sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.quick-actions-grid .btn {
+  width: 100%;
+  justify-content: flex-start;
+  min-height: 44px; /* Touch friendly */
+}
+
+/* Base Form and Filter adjustments */
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-controls select {
+  flex: 1;
+  min-width: 150px;
+}
+
+.toolbar-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* 1440px and below is handled natively by the CSS Grid minmax if we switch stats-cards to auto-fit */
+
 @media (max-width: 1024px) {
   .stats-cards-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1604,6 +1642,10 @@ body.dark-theme .tab-view-wrap .stat-card {
   .dashboard-performance-section {
     grid-template-columns: 1fr;
   }
+  
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -1612,10 +1654,38 @@ body.dark-theme .tab-view-wrap .stat-card {
     height: auto;
     min-height: calc(100vh - 70px);
   }
+  
+  /* Filter stack on mobile */
+  .filter-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filter-controls select {
+    width: 100%;
+  }
+  
+  .toolbar-action-buttons {
+    width: 100%;
+  }
+  
+  .toolbar-action-buttons .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
   .stats-cards-grid {
     grid-template-columns: 1fr; /* Stack 1 card per row on mobile */
   }
+  
+  .quick-actions-grid {
+    grid-template-columns: 1fr; /* Back to 1 column on mobile */
+  }
+  
   .table-card {
     padding: 16px;
   }
 }
+

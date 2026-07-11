@@ -961,20 +961,20 @@ const AdminDashboard = () => {
             </div>
 
             {/* Quick Actions & Inventory Summary */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="dashboard-sidebar-column">
               <div className="table-card" style={{ padding: '20px' }}>
                 <h4 style={{ marginBottom: '16px' }}>Quick Actions</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <button className="btn btn-primary" onClick={handleAddProductClick} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                <div className="quick-actions-grid">
+                  <button className="btn btn-primary" onClick={handleAddProductClick}>
                     <FaPlus style={{ marginRight: '8px' }} /> Add New Product
                   </button>
-                  <button className="btn btn-secondary" onClick={() => { setEditingCategory(null); setCategoryForm({ name: '', parent: '' }); setCategoryModalOpen(true); }} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                  <button className="btn btn-secondary" onClick={() => { setEditingCategory(null); setCategoryForm({ name: '', parent: '' }); setCategoryModalOpen(true); }}>
                     <FaPlus style={{ marginRight: '8px' }} /> Create Category
                   </button>
-                  <button className="btn btn-secondary" onClick={() => navigate('/admin/inventory')} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                  <button className="btn btn-secondary" onClick={() => navigate('/admin/inventory')}>
                     <FaBoxOpen style={{ marginRight: '8px' }} /> Manage Stock levels
                   </button>
-                  <button className="btn btn-secondary" onClick={() => navigate('/admin/profile')} style={{ width: '100%', justifyContent: 'flex-start' }}>
+                  <button className="btn btn-secondary" onClick={() => navigate('/admin/profile')}>
                     <FaUsers style={{ marginRight: '8px' }} /> Update Admin Profile
                   </button>
                 </div>

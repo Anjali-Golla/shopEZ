@@ -26,7 +26,11 @@ const AdminLayout = () => {
 
   return (
     <div className={`admin-layout-container ${sidebarCollapsed ? 'collapsed' : ''}`}>
-      <AdminSidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
+      <AdminSidebar 
+        collapsed={sidebarCollapsed} 
+        toggleSidebar={toggleSidebar} 
+        setSidebarCollapsed={setSidebarCollapsed}
+      />
       
       {/* Mobile Drawer Overlay */}
       {!sidebarCollapsed && window.innerWidth <= 768 && (

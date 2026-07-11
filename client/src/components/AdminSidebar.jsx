@@ -14,7 +14,7 @@ import {
 import { AuthContext } from '../context/AuthContext';
 import './AdminSidebar.css';
 
-const AdminSidebar = ({ collapsed, toggleSidebar }) => {
+const AdminSidebar = ({ collapsed, toggleSidebar, setSidebarCollapsed }) => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,6 +31,9 @@ const AdminSidebar = ({ collapsed, toggleSidebar }) => {
 
   const handleNavClick = (path) => {
     navigate(path);
+    if (window.innerWidth <= 768 && setSidebarCollapsed) {
+      setSidebarCollapsed(true);
+    }
   };
 
   const handleLogout = () => {
