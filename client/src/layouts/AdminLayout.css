@@ -37,9 +37,15 @@ body.dark-theme .admin-layout-container {
 
 @media (max-width: 768px) {
   .admin-layout-container {
-    grid-template-columns: 1fr;
+    display: flex; /* Switch from Grid to Flex to prevent row stacking */
+    flex-direction: column;
+  }
+  .admin-main-wrapper {
+    width: 100%;
   }
   .admin-page-content {
     padding: 16px;
   }
+  
+  /* Sidebar Drawer Overlay specific styles will be handled in AdminDashboard.css/AdminSidebar.css */
 }

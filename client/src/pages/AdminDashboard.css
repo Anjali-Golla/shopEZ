@@ -132,6 +132,29 @@
   color: var(--error-color);
 }
 
+/* SIDEBAR MOBILE DRAWER */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Hidden by default */
+    height: 100vh;
+    width: 260px;
+    z-index: 1000;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* When sidebarCollapsed is FALSE, it means the menu is OPEN on mobile! */
+  .admin-dashboard-container:not(.collapsed) .admin-sidebar {
+    left: 0;
+  }
+  
+  /* The toggle on mobile is inside the topbar, so we might want to hide the internal sidebar toggle */
+  .sidebar-toggle {
+    display: none;
+  }
+}
+
 /* 3. TOP NAVBAR HEADER */
 .admin-topbar {
   background-color: var(--card-bg);
@@ -1567,3 +1590,32 @@ body.dark-theme .tab-view-wrap .stat-card {
 
 
 
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVENESS
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .stats-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-details-row {
+    grid-template-columns: 1fr; /* Stack Recent Orders and Inventory Summary */
+  }
+  .dashboard-performance-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 16px;
+    height: auto;
+    min-height: calc(100vh - 70px);
+  }
+  .stats-cards-grid {
+    grid-template-columns: 1fr; /* Stack 1 card per row on mobile */
+  }
+  .table-card {
+    padding: 16px;
+  }
+}

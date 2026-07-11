@@ -120,7 +120,7 @@ const AdminDashboard = () => {
   // Settings state
   const [storeSettings, setStoreSettings] = useState({
     storeName: 'ShopEZ Premium E-Commerce',
-    websiteLogo: 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
+    websiteLogo: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
     contactEmail: 'admin@shopez.com',
     supportNumber: '+91 98765 43210',
     taxRate: 18,
@@ -145,9 +145,9 @@ const AdminDashboard = () => {
     }
   }, [user]);
 
-  // Fetch admin data on mount
-  const fetchAdminData = async () => {
-    setLoading(true);
+  // Fetch admin data on mount or background poll
+  const fetchAdminData = async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
     const config = {
       headers: { Authorization: `Bearer ${user.token}` },
     };
@@ -167,16 +167,20 @@ const AdminDashboard = () => {
       setCategoriesState(categoriesRes.data || []);
       setCouponsList(couponsRes.data || []);
       setAnalyticsData(analyticsRes.data || null);
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     } catch (error) {
       console.error('Failed to load admin console data', error);
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
   useEffect(() => {
     if (user && user.role === 'admin') {
-      fetchAdminData();
+      fetchAdminData(false); // Initial Foreground Load
+      
+      // 15-second Real-time Polling
+      const intervalId = setInterval(() => fetchAdminData(true), 15000);
+      return () => clearInterval(intervalId);
     }
   }, [user]);
 
@@ -1099,11 +1103,11 @@ const AdminDashboard = () => {
                     </td>
                     <td>
                       <img 
-                        src={p.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+                        src={p.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
                         alt={p.name} 
                         className="table-thumb-premium" 
                         onClick={() => setViewProductDetails(p)} 
-                        onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+                        onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
                       />
                     </td>
                     <td>
@@ -1440,10 +1444,10 @@ const AdminDashboard = () => {
                       <td>
                         <div className="product-table-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           <img 
-                            src={p.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+                            src={p.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
                             alt={p.name} 
                             style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)', flexShrink: 0 }} 
-                            onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+                            onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
                           />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             <strong className="inventory-product-name" title={p.name}>
