@@ -1005,26 +1005,7 @@
   .admin-dashboard-container {
     grid-template-columns: 1fr;
   }
-  .admin-sidebar {
-    position: sticky;
-    top: 70px;
-    z-index: 100;
-    flex-direction: row;
-    justify-content: space-around;
-    padding: 12px;
-    height: auto;
-  }
-  .sidebar-brand-wrapper {
-    display: none;
-  }
-  .sidebar-nav {
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-  }
-  .nav-btn span {
-    display: none;
-  }
+  /* Drawer logic is now properly handled at the top of the file */
   .admin-content {
     padding: 16px;
     height: auto;
