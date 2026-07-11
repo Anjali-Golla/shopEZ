@@ -481,9 +481,9 @@ const Checkout = () => {
                   return (
                     <div key={item.product._id} className="summary-item-row">
                       <img 
-                        src={item.product.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+                        src={item.product.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
                         alt={item.product.name} 
-                        onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+                        onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
                       />
                       <div className="summary-item-info">
                         <h4>{item.product.name}</h4>

@@ -93,8 +93,8 @@ const ProductDetails = () => {
     if (!product) return [];
     return [
       product.image,
-      "https://placehold.co/600x400/eeeeee/999999?text=Product+Image",
-      "https://placehold.co/600x400/eeeeee/999999?text=Product+Image",
+      "https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg",
     ];
   }, [product]);
 
@@ -332,10 +332,10 @@ const ProductDetails = () => {
         <div className="gallery-section">
           <div className="main-image-container">
             <img 
-              src={activeImage || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+              src={activeImage || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
               alt={name} 
               className="main-image" 
-              onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+              onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
             />
             {discountPercentage && (
               <span className="details-discount-badge">-{discountPercentage}%</span>
@@ -349,9 +349,9 @@ const ProductDetails = () => {
                 onClick={() => setActiveImage(imgUrl)}
               >
                 <img 
-                  src={imgUrl || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+                  src={imgUrl || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
                   alt={`Thumbnail ${index + 1}`} 
-                  onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+                  onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
                 />
               </button>
             ))}
@@ -467,9 +467,9 @@ const ProductDetails = () => {
             <div className="bundle-items-flex">
               <div className="bundle-item-card">
                 <img 
-                  src={product.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+                  src={product.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
                   alt={name} 
-                  onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+                  onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
                 />
                 <h5>{name}</h5>
                 <Price price={price} discountPrice={discountPrice} size="sm" />
@@ -479,9 +479,9 @@ const ProductDetails = () => {
 
               <div className="bundle-item-card">
                 <img 
-                  src={bundleProduct.image || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'} 
+                  src={bundleProduct.image || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'} 
                   alt={bundleProduct.name} 
-                  onError={(e) => { e.target.src = 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image'; }}
+                  onError={(e) => { e.target.src = 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg'; }}
                 />
                 <h5>{bundleProduct.name}</h5>
                 <Price price={bundleProduct.price} discountPrice={bundleProduct.discountPrice} size="sm" />

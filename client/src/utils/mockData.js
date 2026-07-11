@@ -15,63 +15,63 @@ export const categories = [
     id: 'electronics',
     name: 'Electronics',
     icon: FaLaptop,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+1',
+    image: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
     path: '/products?category=electronics'
   },
   {
     id: 'mobiles',
     name: 'Mobiles',
     icon: FaMobileAlt,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+2',
+    image: 'https://m.media-amazon.com/images/I/71d7rfSl0wL._AC_SL1500_.jpg',
     path: '/products?category=mobiles'
   },
   {
     id: 'laptops',
     name: 'Laptops',
     icon: FaLaptop,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+3',
+    image: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
     path: '/products?category=laptops'
   },
   {
     id: 'men-fashion',
     name: "Men's Fashion",
     icon: FaTshirt,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+4',
+    image: 'https://m.media-amazon.com/images/I/61Nl8q4lV2L._AC_UL1500_.jpg',
     path: '/products?category=men-fashion'
   },
   {
     id: 'women-fashion',
     name: "Women's Fashion",
     icon: FaTshirt,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+5',
+    image: 'https://m.media-amazon.com/images/I/71Y32K55BqL._AC_UL1500_.jpg',
     path: '/products?category=women-fashion'
   },
   {
     id: 'footwear',
     name: 'Footwear',
     icon: FaRunning,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+6',
+    image: 'https://m.media-amazon.com/images/I/71D9ImsvEtL._AC_UY695_.jpg',
     path: '/products?category=footwear'
   },
   {
     id: 'home-kitchen',
     name: 'Home & Kitchen',
     icon: FaCouch,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+7',
+    image: 'https://m.media-amazon.com/images/I/81BDBKkQ4AL._AC_SL1500_.jpg',
     path: '/products?category=home-kitchen'
   },
   {
     id: 'beauty',
     name: 'Beauty',
     icon: FaGem,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+8',
+    image: 'https://m.media-amazon.com/images/I/61S7PBB9g9L._SL1500_.jpg',
     path: '/products?category=beauty'
   },
   {
     id: 'sports',
     name: 'Sports',
     icon: FaRunning,
-    image: 'https://placehold.co/500x500/eeeeee/999999?text=Product+9',
+    image: 'https://m.media-amazon.com/images/I/71Xm3Q+-l+L._AC_SL1500_.jpg',
     path: '/products?category=sports'
   }
 ];
@@ -515,7 +515,7 @@ export const products = [
     "brand": "Sony",
     "category": "Electronics",
     "subcategory": "Headphones",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+37",
+    "image": "https://m.media-amazon.com/images/I/61+NGnL2EAL._AC_SL1500_.jpg",
     "description": "Industry-leading noise cancellation with Auto NC Optimizer, crystal clear hands-free calling, and up to 30 hours of quick-charge battery.",
     "price": 39900,
     "discountPercentage": 12.5,
@@ -579,7 +579,7 @@ export const products = [
     "brand": "Boat",
     "category": "Electronics",
     "subcategory": "Headphones",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+41",
+    "image": "https://m.media-amazon.com/images/I/51xxA+6E+xL._AC_SL1500_.jpg",
     "description": "Affordable wireless headphones with massive signature bass, up to 15 hours playback, and comfortable padded earcups.",
     "price": 4900,
     "discountPercentage": 20.4,
@@ -659,7 +659,7 @@ export const products = [
     "brand": "Levi's",
     "category": "Fashion",
     "subcategory": "Men's Clothing",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+46",
+    "image": "https://m.media-amazon.com/images/I/81p+zJ5sYVL._AC_UL1500_.jpg",
     "description": "A modern slim with room to move. The 511 Slim Fit Jeans are a classic since right now. These jeans are cut close to the body.",
     "price": 7900,
     "discountPercentage": 25.3,
@@ -819,7 +819,7 @@ export const products = [
     "brand": "Carter's",
     "category": "Fashion",
     "subcategory": "Kids Wear",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+56",
+    "image": "https://m.media-amazon.com/images/I/71B9g+EONgL._AC_UX679_.jpg",
     "description": "Super soft 100% organic cotton baby onesies with snap-button bottom closure and cute embroidered cartoon hood detail.",
     "price": 3200,
     "discountPercentage": 25,
@@ -963,7 +963,7 @@ export const products = [
     "brand": "Michael Kors",
     "category": "Fashion",
     "subcategory": "Bags",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+65",
+    "image": "https://m.media-amazon.com/images/I/71D9ImsvEtL._AC_UY695_.jpg",
     "description": "Sophisticated structured handbag crafted in cross-grain saffiano leather with polished gold-tone hardware detailing.",
     "price": 24800,
     "discountPercentage": 20.2,
@@ -995,7 +995,7 @@ export const products = [
     "brand": "Keurig",
     "category": "Home & Kitchen",
     "subcategory": "Home & Kitchen",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+67",
+    "image": "https://m.media-amazon.com/images/I/61k6Z+N0TKL._AC_SL1500_.jpg",
     "description": "Premium single-cup pod brewer with strong brew options, iced coffee settings, and custom hot water dispensing controls.",
     "price": 18900,
     "discountPercentage": 15.9,
@@ -1075,7 +1075,7 @@ export const products = [
     "brand": "Clinique",
     "category": "Beauty",
     "subcategory": "Beauty",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+72",
+    "image": "https://m.media-amazon.com/images/I/61S7PBB9g9L._SL1500_.jpg",
     "description": "Oil-free gel-cream moisturizer with exclusive aloe bio-ferment and hyaluronic acid that penetrates deep, lasting for 100 hours.",
     "price": 4600,
     "discountPercentage": 15.2,
@@ -1203,7 +1203,7 @@ export const products = [
     "brand": "Harriman House",
     "category": "Books",
     "subcategory": "Books",
-    "image": "https://placehold.co/500x500/eeeeee/999999?text=Product+80",
+    "image": "https://m.media-amazon.com/images/I/71g2ednj0JL._AC_UY327_FMwebp_QL65_.jpg",
     "description": "Timeless lessons on wealth, greed, and happiness. Morgan shares 19 short stories exploring the strange ways people think about money.",
     "price": 2000,
     "discountPercentage": 25,
@@ -1267,21 +1267,21 @@ export const reviews = [
   {
     id: 1,
     name: 'Sarah Jenkins',
-    avatar: 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
+    avatar: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
     rating: 5,
     comment: 'Exceptional service and quick delivery! The headphones sound absolutely incredible, and the packaging was robust. Highly recommend ShopEZ.'
   },
   {
     id: 2,
     name: 'Marcus Chen',
-    avatar: 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
+    avatar: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
     rating: 5,
     comment: 'Buying the new iPhone was so easy. The customer support answered my questions about warranty instantly. A truly premium MERN platform.'
   },
   {
     id: 3,
     name: 'Emily Rodriguez',
-    avatar: 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
+    avatar: 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
     rating: 4,
     comment: 'The Nike shoes are original and extremely comfortable. The discount price here was better than other online retail sites. Very satisfied.'
   }

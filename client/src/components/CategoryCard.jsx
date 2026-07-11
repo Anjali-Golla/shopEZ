@@ -5,17 +5,17 @@ import './CategoryCard.css';
 const CategoryCard = ({ name, icon: Icon, image, path }) => {
   // Category-specific high-quality fallback background images from Unsplash
   const fallbackImages = {
-    'electronics': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
-    'fashion': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
-    'home & kitchen': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
-    'beauty': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
-    'sports': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
-    'books': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
-    'accessories': 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image',
+    'electronics': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    'fashion': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    'home & kitchen': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    'beauty': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    'sports': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    'books': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
+    'accessories': 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg',
   };
 
   const nameKey = String(name).toLowerCase().trim();
-  const bgImage = image || fallbackImages[nameKey] || 'https://placehold.co/600x400/eeeeee/999999?text=Product+Image';
+  const bgImage = image || fallbackImages[nameKey] || 'https://m.media-amazon.com/images/I/71jG+e7roXL._AC_SL1500_.jpg';
 
   return (
     <Link to={path} className="category-card">
