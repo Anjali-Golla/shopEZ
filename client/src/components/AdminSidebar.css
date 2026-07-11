@@ -89,25 +89,4 @@
   color: #f87171;
 }
 
-@media (max-width: 768px) {
-  .admin-sidebar {
-    position: sticky;
-    top: 70px;
-    z-index: 100;
-    flex-direction: row;
-    justify-content: space-around;
-    padding: 12px;
-    height: auto;
-  }
-  .sidebar-brand-wrapper {
-    display: none;
-  }
-  .sidebar-nav {
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-  }
-  .nav-btn span {
-    display: none;
-  }
-}
+/* Mobile drawer logic is handled in AdminDashboard.css */
