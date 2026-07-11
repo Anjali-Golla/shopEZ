@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './components/ToastConfig.css';
 import MainLayout from './layouts/MainLayout';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -73,15 +74,18 @@ function App() {
         </Suspense>
         <ToastContainer 
           position="top-right" 
-          autoClose={3000} 
-          hideProgressBar={false} 
+          autoClose={4000} 
+          limit={3}
+          hideProgressBar={true} 
           newestOnTop={false} 
           closeOnClick 
           rtl={false} 
           pauseOnFocusLoss 
           draggable 
           pauseOnHover 
-          theme="colored" 
+          theme="colored"
+          className="custom-toast-container"
+          toastClassName="custom-toast"
         />
       </BrowserRouter>
     </ErrorBoundary>

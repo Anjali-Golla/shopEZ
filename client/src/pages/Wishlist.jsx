@@ -31,7 +31,8 @@ const Wishlist = () => {
 
   const handleAddToCartFromWishlist = async (product) => {
     try {
-      await addToCart(product._id, 1);
+      const res = await addToCart(product._id, 1);
+      if (!res) return;
       await removeFromWishlist(product._id);
       toast.success(`"${product.name}" moved to cart!`);
     } catch (err) {

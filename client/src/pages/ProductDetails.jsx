@@ -156,7 +156,8 @@ const ProductDetails = () => {
   const handleAddToCartClick = async () => {
     if (!product) return;
     try {
-      await addToCart(product._id, quantity);
+      const res = await addToCart(product._id, quantity);
+      if (!res) return;
       toast.success(`Added ${quantity}x "${product.name}" to cart!`);
     } catch (err) {
       toast.error(err || 'Failed to add item');
@@ -192,8 +193,10 @@ const ProductDetails = () => {
   const handleAddBundleToCartClick = async () => {
     if (!product || !bundleProduct) return;
     try {
-      await addToCart(product._id, 1);
-      await addToCart(bundleProduct._id, 1);
+      const res1 = await addToCart(product._id, 1);
+      if (!res1) return;
+      const res2 = await addToCart(bundleProduct._id, 1);
+      if (!res2) return;
       toast.success(`Added Bundle ("${product.name}" + "${bundleProduct.name}") to your cart at a discounted rate!`);
       navigate('/cart');
     } catch (err) {
