@@ -131,8 +131,8 @@ const Home = () => {
         </div>
         <div className="hero-image-container">
           <img 
-            src="/hero_banner.png" 
-            alt="Premium Shopping" 
+            src="/summer_banner.png" 
+            alt="Summer Exclusive Collection" 
             className="hero-image"
           />
         </div>
