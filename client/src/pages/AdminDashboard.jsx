@@ -923,7 +923,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Rearranged Main Row */}
-          <div className="dashboard-details-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginTop: '24px' }}>
+          <div className="dashboard-details-row" style={{ marginTop: '24px' }}>
             {/* Recent Orders */}
             <div className="table-card" style={{ height: '100%' }}>
               <h4>Recent Orders</h4>
