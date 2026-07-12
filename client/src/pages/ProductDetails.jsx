@@ -341,21 +341,6 @@ const ProductDetails = () => {
               <span className="details-discount-badge">-{discountPercentage}%</span>
             )}
           </div>
-          <div className="thumbnails-row">
-            {galleryImages.map((imgUrl, index) => (
-              <button
-                key={index}
-                className={`thumbnail-btn ${activeImage === imgUrl ? 'active' : ''}`}
-                onClick={() => setActiveImage(imgUrl)}
-              >
-                <img 
-                  src={imgUrl || '/placeholder.png'} 
-                  alt={`Thumbnail ${index + 1}`} 
-                  onError={(e) => { e.target.src = '/placeholder.png'; }}
-                />
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Right Section: Details Panel */}
